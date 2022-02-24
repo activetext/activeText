@@ -115,9 +115,12 @@ query_label <- function(docs, label_id_vec, n_class, labels, doc_name,
 
     for (i in 1:length(label_id_vec)) {
 
-      lab <- docs %>%
-        dplyr::filter(!!dplyr::sym(index_name) == label_id_vec[i]) %>%
-        pull(!!dplyr::sym(labels_name))
+      lab_row <- docs %>%
+        dplyr::filter(!!dplyr::sym(index_name) == label_id_vec[i])
+      lab <- ifelse(
+        is.null(labels_name), NA,
+        lab_row %>% pull(!!dplyr::sym(labels_name))
+      )
 
       if (is.na(lab)) {
 
