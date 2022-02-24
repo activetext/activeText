@@ -1,0 +1,35 @@
+Package: activeEMtext
+Title: What the Package Does (One Line, Title Case)
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "First",
+           family = "Last",
+           role = c("aut", "cre"),
+           email = "first.last@example.com")
+Description: What the package does (one paragraph).
+License: What license it uses
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.0.2
+Suggests: knitr, rmarkdown
+VignetteBuilder: knitr
+Imports: 
+    dplyr,
+    tidytext,
+    tm,
+    matrixStats,
+    tidyr,
+    stringr,
+    tibble,
+    progress,
+    Matrix,
+    parallel,
+    foreach,
+    bigstatsr,
+    doParallel,
+    gofastr,
+    quanteda,
+    gtools,
+    janitor,
+    patchwork,
+    ggplot2
