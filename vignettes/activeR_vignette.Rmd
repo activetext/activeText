@@ -1,0 +1,51 @@
+---
+title: "activeR_vignette"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{activeR_vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+After installing the package, load it as normal using the `library()` function.
+
+```{r setup}
+library(activeR)
+library(tidyverse)
+```
+
+Let's take a look at the dataset that we'll use for our demonstration of the package.
+```{r}
+activeR::bbc_data_all
+```
+The BBC news dataset contains 2,215 news articles that are evenly divided between tech, sports, politics, and business. All articles that belong to the politics group are labeled as 1, and all other articles are labeled as 0.
+
+```{r}
+activeR::activeR(
+           data = activeR
+         )
+
+activeR::activeR_validate(
+
+         )
+```
+
+```{r}
+bbc_docs <- activeR::bbc_data_all %>%
+  select(-label)
+results <- activeR::active_EM_dev(
+                      docs = bbc_docs
+                      labels_name = "label",
+                      handlabel = TRUE,
+                      keywords_list = list(NA, NA),
+                      export_all = FALSE,
+                      export_all_em = FALSE
+                    )
+```
