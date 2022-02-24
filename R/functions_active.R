@@ -142,7 +142,7 @@ active_EM_dev <- function(docs,
                           n_cluster_collapse_type = "simple",
                           beta = NA,
                           active_eta_query = FALSE,
-                          keywords_list = NA,
+                          keywords_list = list(NA, NA),
                           keywords_scheme = NA,
                           true_eta = NA,
                           gamma = NA,
@@ -152,7 +152,6 @@ active_EM_dev <- function(docs,
                           contextual_varnames = NA,
                           mc_iter = NA,
                           ...) {
-
 
   ## Messages
   ## --------------------------------------------------------------------------
