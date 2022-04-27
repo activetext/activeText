@@ -37,7 +37,7 @@ clean_data <- function(docs, n_class, doc_name, index_name, labels_name=NULL,
     #'                                 labels for the documents in 'toLabel'.
 
     # Turn documents into tibble
-    docs <- dplyr::as_tibble(docs)
+    docs <- tibble::as_tibble(docs)
 
     # Data cleaning
     if (keep_labels == T) {
@@ -947,7 +947,7 @@ match_clusters_to_docs <- function(docs, EMoutput, index_name, n_cluster) {
 
   row_names <- rownames(EMoutput)
   EM_out_tbl <- as.matrix(EMoutput) %>%
-    dplyr::as_tibble() %>%
+    tibble::as_tibble() %>%
     dplyr::mutate(!!dplyr::sym(index_name) := row_names)
   docs <- docs %>%
     left_join(EM_out_tbl, by = index_name)
@@ -976,7 +976,7 @@ match_EM_to_docs <- function(docs, EMoutput, classes, doc_name, index_name,
 
 
   match_type <- class(docs[[paste0(index_name)]])
-  to_join <- dplyr::as_tibble(as.matrix(EMoutput),
+  to_join <- tibble::as_tibble(as.matrix(EMoutput),
                               rownames=paste0(index_name)) %>%
     dplyr::mutate(!!dplyr::sym(index_name) :=
                     if (match_type == "numeric" |
@@ -1169,7 +1169,7 @@ get_mean_mpe <- function(mod, dfm, val_data, labels_name = "label", index_name =
     .word_prob = mod$eta
   ) %>% as.matrix %>%
   `colnames<-`(cluster_names) %>%
-  as_tibble(rownames = "id")
+  tibble::as_tibble(rownames = "id")
 
   class_preds <- agg_helper_convert(out_prediction, n_cluster_collapse_type)
 
@@ -1348,7 +1348,7 @@ gen_results_tbl <- function(include_out_stats, metadata, max_iters, model_name) 
   }
   res_obj <- bind_cols(
     res_obj,
-    as_tibble(metadata, .rows = max_iters)
+    tibble::as_tibble(metadata, .rows = max_iters)
   )
 
 
@@ -1419,10 +1419,10 @@ update_em_param_tbl <- function(em_param_tbl, model_output, base_index, id) {
   model_predictions <- tibble() %>%
     dplyr::mutate(dfm_id = id) %>%
     left_join(
-      as_tibble(
-        as.matrix(model_outputs[[i]]$classLik),
-        rownames = paste0(index_name)
-      ),
+      tibble::as_tibble(
+                as.matrix(model_outputs[[i]]$classLik),
+                rownames = paste0(index_name)
+              ),
       by = paste0(index_name)
     ) %>%
     bind_rows(model_predictions_in)
@@ -1438,14 +1438,14 @@ model_out_to_tbl <- function(model_outputs) {
   for (i in 1:length(model_outputs)) {
     model_output_in_lst[[i]] <- model_outputs[[i]]$classLik %>%
       as.matrix() %>%
-      as_tibble(rownames = "id") %>%
+      tibble::as_tibble(rownames = "id") %>%
       `colnames<-`(c("id", get_clusters(ncol(.)))) %>%
       dplyr::mutate(dfm_id = i)
 
     if (length(model_outputs[[i]]$out_prediction) != 0) {
       model_output_out_lst[[i]] <- model_outputs[[i]]$out_prediction %>%
         as.matrix() %>%
-        as_tibble(rownames = "id") %>%
+        tibble::as_tibble(rownames = "id") %>%
         `colnames<-`(c("id", get_clusters(ncol(.)))) %>%
         dplyr::mutate(dfm_id = i)
     }
