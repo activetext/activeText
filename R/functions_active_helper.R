@@ -515,7 +515,7 @@ get_class_matrix <- function(docs, n_class, hand_labeled_index,
   C_train <- docs %>%
     dplyr::filter(!!dplyr::sym(index_name) %in% hand_labeled_index) %>%
     dplyr::select_at(dplyr::vars(index_name, dplyr::matches("^Class")))
-  index <- C_train %>% pull(!!dplyr::sym(index_name))
+  index <- C_train %>% dplyr::pull(!!dplyr::sym(index_name))
   col_names <- colnames(C_train)
   C_train <- C_train %>% dplyr::select(-!!dplyr::sym(index_name))
   C_train <- purrr::map(C_train, Matrix::Matrix, sparse = T) %>%
@@ -1177,8 +1177,8 @@ get_mean_mpe <- function(mod, dfm, val_data, labels_name = "label", index_name =
     dplyr::select(!!dplyr::sym(labels_name), !!dplyr::sym(index_name)) %>%
     dplyr::left_join(class_preds, by = index_name) %>%
     dplyr::mutate(mpe = abs(!!dplyr::sym(labels_name) - exp(Class_2))) %>%
-    summarize(mean_mpe = mean(mpe)) %>%
-    pull(mean_mpe)
+    dplyr::summarize(mean_mpe = mean(mpe)) %>%
+    dplyr::pull(mean_mpe)
 
   return(mean_mpe)
 }
@@ -1242,7 +1242,7 @@ choose_best_model <- function(model_preds, model_weights, index_name = "id") {
     right_join(model_preds, by = "dfm_id")
   best_dfm_id <- best_model_preds %>%
     filter(model_weights == best_model_weight) %>%
-    pull(dfm_id) %>%
+    dplyr::pull(dfm_id) %>%
     unique %>%
     sample(1)
   best_model_preds <- best_model_preds %>%
