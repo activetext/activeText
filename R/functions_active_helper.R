@@ -950,7 +950,7 @@ match_clusters_to_docs <- function(docs, EMoutput, index_name, n_cluster) {
     tibble::as_tibble() %>%
     dplyr::mutate(!!dplyr::sym(index_name) := row_names)
   docs <- docs %>%
-    left_join(EM_out_tbl, by = index_name)
+    dplyr::left_join(EM_out_tbl, by = index_name)
   return(docs)
 
 }
@@ -1418,7 +1418,7 @@ initialize_beta_tbl <- function(dfms, n_class, keywords_list = NA, gamma) {
 update_em_param_tbl <- function(em_param_tbl, model_output, base_index, id) {
   model_predictions <- tibble() %>%
     dplyr::mutate(dfm_id = id) %>%
-    left_join(
+    dplyr::left_join(
       tibble::as_tibble(
                 as.matrix(model_outputs[[i]]$classLik),
                 rownames = paste0(index_name)
@@ -1467,7 +1467,7 @@ update_docs <- function(docs_old, new_data, classes = get_classes(n_class)) {
       dplyr::select(!dplyr::matches("^Class"))
 
     return(
-      left_join(base, cols_to_add, by = "id")
+      dplyr::left_join(base, cols_to_add, by = "id")
     )
   } else {
     return(NULL)
