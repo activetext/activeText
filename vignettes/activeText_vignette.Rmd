@@ -1,8 +1,8 @@
 ---
-title: "activeR_vignette"
+title: "activeText_vignette"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{activeR_vignette}
+  %\VignetteIndexEntry{activeText_vignette}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -14,29 +14,33 @@ knitr::opts_chunk$set(
 )
 ```
 
+```{r}
+install_github("activetext/activeText")
+```
 After installing the package, load it as normal using the `library()` function.
 
 ```{r setup}
-library(activeR)
+library(activeText)
+devtools::install()
 library(tidyverse)
 ```
 
 Let's take a look at the dataset that we'll use for our demonstration of the package.
 ```{r}
-activeR::bbc_data_all
+activeText::bbc_data_all
 ```
 The BBC news dataset contains 2,215 news articles that are evenly divided between tech, entertainment, sports, politics, and business. All articles that belong to the politics group are labeled as 1, and all other articles are labeled as 0.
 
 ```{r}
-results <- activeR::active_EM_dev(
-                      docs = activeR::bbc_data_all,
+results <- activeText::active_label(
+                      docs = activeText::bbc_data_all,
                       handlabel = FALSE,
                       labels = c("Not Political", "Political"),
                       labels_name = "label",
                       lambda = 0.01,
-                      max_active = 3,
-                      init_size = 5,
-                      max_query = 5
+                      max_active = 10,
+                      init_size = 1,
+                      max_query = 1
                     )
 print(results$docs)
 ```

@@ -99,7 +99,7 @@
 #'
 #' @return             [list]       List containing labeled document matrix, prior weights, word likelihoods, and a vector
 #'                                  of user-labeled documents ids.
-active_EM_dev <- function(docs,
+active_label <- function(docs,
                           labels=c(0, 1),
                           doc_name = "text",
                           index_name = "id",

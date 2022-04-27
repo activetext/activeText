@@ -2,7 +2,7 @@
 
 export(EM)
 export(KL)
-export(active_EM_dev)
+export(active_label)
 export(agg_helper_convert)
 export(aggregate_model_predictions)
 export(balancing_data)
