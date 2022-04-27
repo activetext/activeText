@@ -142,7 +142,7 @@ query_label <- function(docs, label_id_vec, n_class, labels, doc_name,
         if (!is.na(metadata_vars)) {
           docs %>%
             filter(!!dplyr::sym(index_name) == label_id_vec[i]) %>%
-            select(metadata_vars) %>%
+            dplyr::select(metadata_vars) %>%
             glimpse()
         }
 
@@ -839,15 +839,15 @@ get_uncertain_docs <- function(docs, bound, max_query,
 
   if (query_type == "basic_entropy") {
     entropy <- docs %>%
-      select_at(vars(matches("^Class"))) %>%
+      dplyr::select_at(vars(matches("^Class"))) %>%
       get_entropy()
 
     uncertainClass <- docs %>%
-      mutate(entropy = entropy) %>%
+      dplyr::mutate(entropy = entropy) %>%
       dplyr::filter(!(!!dplyr::sym(index_name)) %in% hand_labeled_index) %>%
-      arrange(desc(entropy)) %>%
-      slice(1:max_query) %>%
-      select(-entropy)
+      dplyr::arrange(desc(entropy)) %>%
+      dplyr::slice(1:max_query) %>%
+      dplyr::select(-entropy)
   }
 
   if (query_type == "normalized_entropy") {
@@ -1137,7 +1137,7 @@ agg_helper_convert <- function(model_preds,
 #' @title Aggregation Helper
 #' @description helps aggregation function by collapsing clusters to classes (binary only).
 
-  cluster_names <- colnames(select(model_preds, -dfm_id))
+  cluster_names <- colnames(dplyr::select(model_preds, -dfm_id))
   pos_cluster <- cluster_names[length(cluster_names)]
   neg_clusters <- cluster_names[1:length(cluster_names) - 1]
 
@@ -1275,9 +1275,9 @@ aggregate_model_predictions <- function(pred_lst,
 
   if (max(pred_tbl_in$dfm_id) == 1) {
 
-    in_agg <- select(pred_tbl_in, -dfm_id)
+    in_agg <- dpylr::select(pred_tbl_in, -dfm_id)
     if (!is.null(pred_lst$model_output_out)) {
-      out_agg <- select(pred_tbl_out, -dfm_id)
+      out_agg <- dpylr::select(pred_tbl_out, -dfm_id)
     }
 
   } else if (agg_type == "random") {
