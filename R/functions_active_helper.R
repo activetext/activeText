@@ -1275,9 +1275,9 @@ aggregate_model_predictions <- function(pred_lst,
 
   if (max(pred_tbl_in$dfm_id) == 1) {
 
-    in_agg <- dpylr::select(pred_tbl_in, -dfm_id)
+    in_agg <- dplyr::select(pred_tbl_in, -dfm_id)
     if (!is.null(pred_lst$model_output_out)) {
-      out_agg <- dpylr::select(pred_tbl_out, -dfm_id)
+      out_agg <- dplyr::select(pred_tbl_out, -dfm_id)
     }
 
   } else if (agg_type == "random") {
