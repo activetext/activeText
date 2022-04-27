@@ -1143,15 +1143,15 @@ agg_helper_convert <- function(model_preds,
 
   if (n_cluster_collapse_type == "simple") {
     model_preds <- model_preds %>%
-      mutate(Class_1 = 1 - model_preds[[pos_cluster]],
-             Class_2 = model_preds[[pos_cluster]])
+      dplyr::mutate(Class_1 = 1 - model_preds[[pos_cluster]],
+                    Class_2 = model_preds[[pos_cluster]])
   } else if (n_cluster_collapse_type == "max_neg") {
     ## Get maximum value of negative clusters by row, then normalize
     model_preds <- model_preds %>%
-      mutate(Class_1 = do.call(pmax, model_preds[neg_clusters]),
-             Class_2 = model_preds[[pos_cluster]],
-             Class_1 = Class_1 / (Class_1 + Class_2),
-             Class_2 = Class_2 / (Class_1 + Class_2))
+      dplyr::mutate(Class_1 = do.call(pmax, model_preds[neg_clusters]),
+                    Class_2 = model_preds[[pos_cluster]],
+                    Class_1 = Class_1 / (Class_1 + Class_2),
+                    Class_2 = Class_2 / (Class_1 + Class_2))
   }
 
   return(model_preds)
@@ -1417,7 +1417,7 @@ initialize_beta_tbl <- function(dfms, n_class, keywords_list = NA, gamma) {
 
 update_em_param_tbl <- function(em_param_tbl, model_output, base_index, id) {
   model_predictions <- tibble() %>%
-    mutate(dfm_id = id) %>%
+    dplyr::mutate(dfm_id = id) %>%
     left_join(
       as_tibble(
         as.matrix(model_outputs[[i]]$classLik),
@@ -1440,14 +1440,14 @@ model_out_to_tbl <- function(model_outputs) {
       as.matrix() %>%
       as_tibble(rownames = "id") %>%
       `colnames<-`(c("id", get_clusters(ncol(.)))) %>%
-      mutate(dfm_id = i)
+      dplyr::mutate(dfm_id = i)
 
     if (length(model_outputs[[i]]$out_prediction) != 0) {
       model_output_out_lst[[i]] <- model_outputs[[i]]$out_prediction %>%
         as.matrix() %>%
         as_tibble(rownames = "id") %>%
         `colnames<-`(c("id", get_clusters(ncol(.)))) %>%
-        mutate(dfm_id = i)
+        dplyr::mutate(dfm_id = i)
     }
   }
 
@@ -1534,7 +1534,7 @@ get_true_eta <- function(docs, dfm, n_class, n_cluster) {
   ## }
 
   docs <- docs %>%
-    mutate(
+    dplyr::mutate(
       Class_1 = ifelse(label == 1, 0, 1),
       Class_2 = ifelse(label == 1, 1, 0)
     )
