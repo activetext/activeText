@@ -866,7 +866,7 @@ get_uncertain_docs <- function(docs, bound, max_query,
       dplyr::mutate(entropy = dplyr::select_at(., dplyr::vars(dplyr::matches("^Class"))) %>%
                       get_entropy(),
                     entropy_rank = ntile(entropy, n=100)) %>%
-      {tryCatch(bind_rows(
+      {tryCatch(dplyr::bind_rows(
          uncertainClass %>% dplyr::filter(entropy_rank > quantileBreaks[1]) %>%
          dplyr::sample_n(max_query * sampleProps[1]),
          uncertainClass %>% dplyr::filter(entropy_rank > quantileBreaks[2] & entropy_rank < quantileBreaks[1] + 1) %>%
@@ -1425,7 +1425,7 @@ update_em_param_tbl <- function(em_param_tbl, model_output, base_index, id) {
               ),
       by = paste0(index_name)
     ) %>%
-    bind_rows(model_predictions_in)
+    dplyr::bind_rows(model_predictions_in)
 }
 
 model_out_to_tbl <- function(model_outputs) {
@@ -1451,9 +1451,9 @@ model_out_to_tbl <- function(model_outputs) {
     }
   }
 
-  out_lst <- list(model_output_in = bind_rows(model_output_in_lst))
+  out_lst <- list(model_output_in = dplyr::bind_rows(model_output_in_lst))
   if (length(model_outputs[[1]]$out_prediction != 0)) {
-    out_lst[["model_output_out"]] <- bind_rows(model_output_out_lst)
+    out_lst[["model_output_out"]] <- dplyr::bind_rows(model_output_out_lst)
   }
 
   return(out_lst)
