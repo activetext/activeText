@@ -61,9 +61,6 @@ We&rsquo;re going to use the package&rsquo;s workhorse function, `active_label` 
 results <- activeText::active_label(
                       docs = activeText::bbc_data_all,
                       labels = c("Not Political", "Political"),
-                      ## max_active = 1,
-                      ## init_size = 1,
-                      ## max_query = 1
                     )
 ```
 
@@ -98,3 +95,24 @@ The user will continue to be prompted for labels until the number of labels per 
     Active Iter: 1/5 EM Runs: [====>--------------------------------] 14/100 (max)
 
 The numerator of the number on the left hand side indicates the current iteration of the active learning process, while the denominator indicates the maximum number of active learning steps allowed. Similarly, the progress bar and the number on the right indicate the number of iterations of the EM algorithm in a given active step.
+
+Once the maximum number of active iterations have run, or a stopping condition is met (such as running out of documents to label), the process ends. We can inspect the classification results as follows.
+
+```R
+results$docs
+```
+
+The variables `Class_1` and `Class_2` represent the estimated probability that a given document belongs to the &ldquo;Political&rdquo; class or not, respectively. To evaluate the classification accuracy, we can simply calculate the proportion of correctly labeled documents, using a simple cutoff of 0.5. We can also filter out the user labeled documents using `results$hand_labeled_index`, which is vector of the ids for documents that have been user-labeled.
+
+```R
+results$docs |>
+  dplyr::filter(!(id %in% results$hand_labeled_index)) |>
+  dplyr::mutate(
+           est_label = ifelse(Class_2 >= 0.5, 1, 0),
+           est_correct = ifelse(label == est_label, 1, 0)
+         ) |>
+  dplyr::pull(est_correct) |>
+  sum() / (nrow(results$docs) - length(results$hand_labeled_index))
+```
+
+Thus, after labeling 60 documents using an active learning process, we are correctly classifying 75 percent of the remaining documents.
