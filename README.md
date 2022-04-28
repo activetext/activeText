@@ -1,7 +1,16 @@
-- [Installation](#org12715d7)
-- [Basic Usage](#org3dde89f)
+![img](./logo.png)
 
-\_ \_ <span class="underline"><span class="underline"><span class="underline">\_</span></span></span> \_ *\\ | | (<span class="underline">) |\_</span> <span class="underline">\_| | | / \\ \_\_\_| |</span> <span class="underline">\_</span> <span class="underline"><span class="underline"><span class="underline"><span class="underline">\_| | \_</span></span></span></span> <span class="underline">| |</span> / /\\ \\ / \_\_| \_\_| \\ \\ / / \_ \\ |* \_ \\ \\/ / <span class="underline"><span class="underline">| / \_\_</span></span> \\ (<span class="underline">\_| |\_| |\\ V / \_\_/ | \_\_/> <| |</span> *\_* \\\_\\\_\_\_|\\\_\_|\_| \\\_/ \\\_\_\_|\_|\\\_\_\_/\_/\\\_\\\\\_\_|
+
+# Table of Contents
+
+1.  [Overview](#org79cefbb)
+2.  [Installation](#org4d5011e)
+3.  [Basic Usage](#org43ecad4)
+
+
+<a id="org79cefbb"></a>
+
+# Overview
 
 R package for using active learning to classify text documents.
 
@@ -12,8 +21,10 @@ Authors:
 -   [Ted Enamorado](https://www.tedenamorado.com/)
 -   [Yuki Shiraito](https://shiraito.github.io)
 
+Recommended citation: ARXIV:
 
-<a id="org12715d7"></a>
+
+<a id="org4d5011e"></a>
 
 # Installation
 
@@ -30,7 +41,7 @@ devtools::install_github("activetext/activeText")
 ```
 
 
-<a id="org3dde89f"></a>
+<a id="org43ecad4"></a>
 
 # Basic Usage
 
@@ -125,7 +136,7 @@ results$docs
     10 10    "Google's toolbar sparks concern\n\nSearch eng…     0       1 2.43e- 90
     # … with 2,215 more rows
 
-The variables `Class_2` and `Class_1` represent the estimated probability that a given document belongs to the &ldquo;Political&rdquo; class or not, respectively. To evaluate the classification accuracy, we can simply calculate the proportion of correctly labeled documents, using a simple cutoff of 0.5. We can also filter out the user labeled documents using `results$hand_labeled_index`, which is vector of the ids for documents that have been user-labeled.
+The variables `Class_1` and `Class_2` represent the estimated probability that a given document belongs to the &ldquo;Political&rdquo; class or not, respectively. To evaluate the classification accuracy, we can simply calculate the proportion of correctly labeled documents, using a simple cutoff of 0.5. We can also filter out the user labeled documents using `results$hand_labeled_index`, which is vector of the ids for documents that have been user-labeled.
 
 ```R
 results$docs |>
