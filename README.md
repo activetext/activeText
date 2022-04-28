@@ -1,6 +1,3 @@
-- [Installation](#org5bc9b89)
-- [Basic Usage](#org35fc5e5)
-
 R package for using active learning to classify text documents.
 
 Authors:
@@ -11,8 +8,6 @@ Authors:
 -   [Yuki Shiraito](https://shiraito.github.io)
 
 
-<a id="org5bc9b89"></a>
-
 # Installation
 
 To install `activeText`, you must first install the `devtools` using the following code:
@@ -21,15 +16,13 @@ To install `activeText`, you must first install the `devtools` using the followi
 if(!require(devtools)) install.packages("devtools")
 ```
 
-Then, load \`devtools\` and use the function \`install<sub>github</sub>()\` to install \`activeText\`:
+Then, load `devtools` and use the function `install_github()` to install `activeText`:
 
 ```R
 library(devtools)
 install_github("activetext/activeText")
 ```
 
-
-<a id="org35fc5e5"></a>
 
 # Basic Usage
 
