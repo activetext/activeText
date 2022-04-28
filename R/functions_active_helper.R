@@ -839,7 +839,7 @@ get_uncertain_docs <- function(docs, bound, max_query,
 
   if (query_type == "basic_entropy") {
     entropy <- docs %>%
-      dplyr::select_at(vars(matches("^Class"))) %>%
+      dplyr::select_at(dplyr::vars(dplyr::matches("^Class"))) %>%
       get_entropy()
 
     uncertainClass <- docs %>%
