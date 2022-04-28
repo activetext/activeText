@@ -16,20 +16,19 @@ To install `activeText`, you must first install the `devtools` using the followi
 if(!require(devtools)) install.packages("devtools")
 ```
 
-Then, load `devtools` and use the function `install_github()` to install `activeText`:
+Then, use the function `devtools::install_github()` to install `activeText`:
 
 ```R
-library(devtools)
-install_github("activetext/activeText")
+devtools::install_github("activetext/activeText")
 ```
 
 
 # Basic Usage
 
-First, start by loading the `activeText` library.
+First, start by setting a seed for reproducability.
 
 ```R
-library(activeText)
+set.seed(1990)
 ```
 
 For this tutorial, we&rsquo;re going to use the included BBC News dataset, which is comprised of 2225 documents, 417 of which belong to the &ldquo;politics&rdquo; class. Let&rsquo;s take a quick look at the data:
@@ -105,16 +104,16 @@ results$docs
     # A tibble: 2,225 × 5
        id    text                                            label Class_1   Class_2
        <chr> <chr>                                           <dbl>   <dbl>     <dbl>
-     1 1     "Ink helps drive democracy in Asia\n\nThe Kyrg…     0 0       1   e+  0
-     2 2     "China net cafe culture crackdown\n\nChinese a…     0 0       1   e+  0
-     3 3     "Microsoft seeking spyware trojan\n\nMicrosoft…     0 0       1   e+  0
-     4 4     "Digital guru floats sub-$100 PC\n\nNicholas N…     0 1   e+0 4.17e- 20
-     5 5     "Technology gets the creative bug\n\nThe hi-te…     0 1   e+0 7.81e- 70
-     6 6     "Wi-fi web reaches farmers in Peru\n\nA networ…     0 4.93e-9 1.00e+  0
-     7 7     "Microsoft releases bumper patches\n\nMicrosof…     0 0       1   e+  0
-     8 8     "Virus poses as Christmas e-mail\n\nSecurity f…     0 0       1   e+  0
-     9 9     "Apple laptop is 'greatest gadget'\n\nThe Appl…     0 1   e+0 1.73e-152
-    10 10    "Google's toolbar sparks concern\n\nSearch eng…     0 6.85e-6 1.00e+  0
+     1 1     "Ink helps drive democracy in Asia\n\nThe Kyrg…     0       0 1   e+  0
+     2 2     "China net cafe culture crackdown\n\nChinese a…     0       1 1.36e- 28
+     3 3     "Microsoft seeking spyware trojan\n\nMicrosoft…     0       1 1.56e- 61
+     4 4     "Digital guru floats sub-$100 PC\n\nNicholas N…     0       1 1.10e- 59
+     5 5     "Technology gets the creative bug\n\nThe hi-te…     0       1 1.69e-109
+     6 6     "Wi-fi web reaches farmers in Peru\n\nA networ…     0       1 2.14e- 63
+     7 7     "Microsoft releases bumper patches\n\nMicrosof…     0       1 5.92e- 51
+     8 8     "Virus poses as Christmas e-mail\n\nSecurity f…     0       1 4.12e- 62
+     9 9     "Apple laptop is 'greatest gadget'\n\nThe Appl…     0       1 9.90e-205
+    10 10    "Google's toolbar sparks concern\n\nSearch eng…     0       1 2.43e- 90
     # … with 2,215 more rows
 
 The variables `Class_1` and `Class_2` represent the estimated probability that a given document belongs to the &ldquo;Political&rdquo; class or not, respectively. To evaluate the classification accuracy, we can simply calculate the proportion of correctly labeled documents, using a simple cutoff of 0.5. We can also filter out the user labeled documents using `results$hand_labeled_index`, which is vector of the ids for documents that have been user-labeled.
@@ -130,6 +129,6 @@ results$docs |>
   sum() / (nrow(results$docs) - length(results$hand_labeled_index))
 ```
 
-    [1] 0.7127021
+    [1] 0.7524249
 
 Thus, after labeling 60 documents using an active learning process, we are correctly classifying 75 percent of the remaining documents.
