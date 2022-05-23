@@ -37,7 +37,7 @@ if(!require(devtools)) install.packages("devtools")
 Then, use the function `devtools::install_github()` to install `activeText`:
 
 ```R
-devtools::install_github("activetext/activeText")
+devtools::install_github("activetext/activeText", ref="main")
 ```
 
 
