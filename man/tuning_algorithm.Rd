@@ -6,7 +6,7 @@
 \usage{
 tuning_algorithm(
   docs,
-  docName,
+  doc_name,
   index_name,
   labelsName,
   measure = "accuracy",
@@ -15,7 +15,7 @@ tuning_algorithm(
   stem = c(F, T),
   ngrams = c(1:3),
   trimPct = c(0, 1e-04, 0.001, 0.01),
-  minDocFreq = c(1, 2, 3),
+  min_doc_freq = c(1, 2, 3),
   idfWeight = c(F, T),
   removeStopWords = c(F, T),
   minChar = 1:4,
