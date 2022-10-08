@@ -139,13 +139,6 @@ query_label <- function(docs, label_id_vec, n_class, labels, doc_name,
           dplyr::pull(!!dplyr::sym(doc_name))
 
         ## Menu-based classification
-        if (!is.na(metadata_vars)) {
-          docs %>%
-            filter(!!dplyr::sym(index_name) == label_id_vec[i]) %>%
-            dplyr::select(metadata_vars) %>%
-            glimpse()
-        }
-
         selection <- menu(labels, title=paste(header, to_label_text, sep="\n\n"))
         ident <- which(docs[[index_name]] == label_id_vec[i])
 
