@@ -164,7 +164,7 @@ get_conf_matrix_weight <- function(docs, labelsName, index_name=NULL,
   
 }
 #' @export
-get_empirical_dist <- function(docs, docsType, docName, index_name, labelsName, n_extreme=50,
+get_empirical_dist <- function(docs, docsType, doc_name, index_name, labelsName, n_extreme=50,
      dfm=NULL, extreme_type="abs_diff", ...) {
 
     #' @title Get True Empirical Word Distributions.
@@ -178,8 +178,8 @@ get_empirical_dist <- function(docs, docsType, docName, index_name, labelsName, 
     # get dfm of all sampled documents
 
     if (is.null(dfm)) {
-        dfm <- get_dfm(docs=docs, docName=docName, index_name=index_name,
-                       stem=stem, trimPct=trimPct, minDocFreq=minDocFreq,
+        dfm <- get_dfm(docs=docs, doc_name=doc_name, index_name=index_name,
+                       stem=stem, trimPct=trimPct, min_doc_freq=min_doc_freq,
                        idfWeight=idfWeight, ngrams=ngrams)
     }
 
@@ -297,9 +297,9 @@ get_fixed_words_mtx <- function(data) {
 }
 
 #' @export
-run_unsupervised_EM <- function(docs, docName, docsType, index_name, labelsName, dfm=NULL,
+run_unsupervised_EM <- function(docs, doc_name, docsType, index_name, labelsName, dfm=NULL,
                                 extreme_words_pos=NULL, extreme_words_neg=NULL,
-                                stem=T, trimPct=0, minDocFreq=1, idfWeight=F,
+                                stem=T, trimPct=0, min_doc_freq=1, idfWeight=F,
                                 ngrams=1, n_extreme=50, n_class=2, export_plot=T,
                                 export_all=T, class_prob=NULL, word_prob=NULL, ...) {
 
@@ -308,8 +308,8 @@ run_unsupervised_EM <- function(docs, docName, docsType, index_name, labelsName,
     #' @return  Document level probabilities, word probabilities, scatterplot of word probablities.
 
     if (is.null(dfm)) {
-        dfm <- get_dfm(docs=docs, docName=docName, index_name=index_name,
-                       stem=stem, trimPct=trimPct, minDocFreq=minDocFreq,
+        dfm <- get_dfm(docs=docs, doc_name=doc_name, index_name=index_name,
+                       stem=stem, trimPct=trimPct, min_doc_freq=min_doc_freq,
                        idfWeight=idfWeight, ngrams=ngrams)
     }
 
@@ -342,7 +342,7 @@ run_unsupervised_EM <- function(docs, docName, docsType, index_name, labelsName,
 
     # match EM results to documents
     # docs <- match_EM_to_docs(docs=docs, EMoutput=output$classLik[[length(output$classLik)]], classes=get_classes(n_class),
-    #                          docName=docName, index_name=index_name, labelsName="label")
+    #                          doc_name=doc_name, index_name=index_name, labelsName="label")
     #
     # Restructure data
     if (export_all == T) {
@@ -401,16 +401,16 @@ KL <- function(p, q){
 }
 
 #' @export
-tuning_algorithm <- function(docs, docName, index_name, labelsName, measure="accuracy", max_runs=30, seed=123,
+tuning_algorithm <- function(docs, doc_name, index_name, labelsName, measure="accuracy", max_runs=30, seed=123,
                              stem=c(F, T), ngrams=c(1:3), trimPct=c(0, 0.0001, 0.001, 0.01),
-                             minDocFreq=c(1, 2, 3), idfWeight=c(F, T), removeStopWords=c(F, T), minChar=1:4,
+                             min_doc_freq=c(1, 2, 3), idfWeight=c(F, T), removeStopWords=c(F, T), minChar=1:4,
                              weight=seq(0, 1, .1), bound=seq(0, 1, .1), initSize=5, maxActive=20,
                              maxQuery=1, queryType=c("basic_entropy", "random"), forceSweep=NA, dfmOut=F) {
 
     #' @title Active EM Parameter Tuning Algorithm
     #' @description Tries to find optimal combination of pre-processing and active algorithm parameters.
 
-    params <- expand.grid(ngrams=ngrams, stem=stem, trimPct=trimPct, minDocFreq=minDocFreq,
+    params <- expand.grid(ngrams=ngrams, stem=stem, trimPct=trimPct, min_doc_freq=min_doc_freq,
                           idfWeight=idfWeight, removeStopWords=removeStopWords, minChar=minChar,
                           weight=weight, bound=bound, initSize=initSize, maxActive=maxActive,
                           maxQuery=maxQuery, queryType=queryType, accuracy=NA, F1=NA, KL=NA)
@@ -424,20 +424,20 @@ tuning_algorithm <- function(docs, docName, index_name, labelsName, measure="acc
     max_runs <- 100
 
     if (dfmOut) {
-        dfm <- get_dfm(docs=docs, docName=docName, index_name=index_name, stem=params[i, "stem"], ngrams=params[i, "ngrams"],
-                       trimPct=params[i, "trimPct"], minDocFreq=params[i, "minDocFreq"], idfWeight=params[i, "idfWeight"],
+        dfm <- get_dfm(docs=docs, doc_name=doc_name, index_name=index_name, stem=params[i, "stem"], ngrams=params[i, "ngrams"],
+                       trimPct=params[i, "trimPct"], min_doc_freq=params[i, "min_doc_freq"], idfWeight=params[i, "idfWeight"],
                        removeStopWords=params[i, "removeStopWords"], minChar=params[i, "minChar"])
     }
 
     repeat {
 
         if (!dfmOut) {
-            dfm <- get_dfm(docs=docs, docName=docName, index_name=index_name, stem=params[i, "stem"], ngrams=params[i, "ngrams"],
-                           trimPct=params[i, "trimPct"], minDocFreq=params[i, "minDocFreq"], idfWeight=params[i, "idfWeight"],
+            dfm <- get_dfm(docs=docs, doc_name=doc_name, index_name=index_name, stem=params[i, "stem"], ngrams=params[i, "ngrams"],
+                           trimPct=params[i, "trimPct"], min_doc_freq=params[i, "min_doc_freq"], idfWeight=params[i, "idfWeight"],
                            removeStopWords=params[i, "removeStopWords"], minChar=params[i, "minChar"])
         }
 
-        active_output <- active_EM(docs=docs, weight=params[i, "weight"], docName=docName, maxActive=params[i, "maxActive"],
+        active_output <- active_EM(docs=docs, weight=params[i, "weight"], doc_name=doc_name, maxActive=params[i, "maxActive"],
                                    maxQuery=params[i, "maxQuery"], initSize=params[i, "initSize"], index_name=index_name, labelsName=labelsName,
                                    bound=params[i, "bound"], handLabel=F, dfm=dfm, forceList=T, queryType=params[i, "queryType"], seed=seed)
 
@@ -446,7 +446,7 @@ tuning_algorithm <- function(docs, docName, index_name, labelsName, measure="acc
 
         params[i, "accuracy"] <- get_classification_accuracy(cf)
         params[i, "F1"] <- get_F1_binary(cf)
-        params[i, "KL"] <-  get_empirical_dist(docs=docs, docsType="", docName=docName,
+        params[i, "KL"] <-  get_empirical_dist(docs=docs, docsType="", doc_name=doc_name,
                                                index_name=index_name, labelsName=labelsName,
                                                dfm=dfm)$word_data %>%
             select(Class_1, Class_2) %>%
@@ -456,7 +456,7 @@ tuning_algorithm <- function(docs, docName, index_name, labelsName, measure="acc
         # params[i, "measure"] <- dplyr::case_when(
         #     measure == "accuracy" ~ get_classification_accuracy(cf),
         #     measure == "F1" ~ get_F1_binary(cf),
-        #     measure == "KL" ~ get_empirical_dist(docs=docs, docsType="", docName=docName,
+        #     measure == "KL" ~ get_empirical_dist(docs=docs, docsType="", doc_name=doc_name,
         #                                          index_name=index_name, labelsName=labelsName,
         #                                          dfm=dfm)$word_data %>%
         #         select(Class_1, Class_2) %>%
@@ -503,7 +503,9 @@ tuning_algorithm <- function(docs, docName, index_name, labelsName, measure="acc
 
         total_runs <- total_runs + 1
         print(params_record)
-        if (total_runs == max_runs | !(T %in% is.na(params[[paste0(measure)]]))) break
+        if (total_runs == max_runs | !(T %in% is.na(params[[paste0(measure)]]))) {
+          break
+        }
 
     }
 
@@ -513,19 +515,19 @@ tuning_algorithm <- function(docs, docName, index_name, labelsName, measure="acc
 
 
 #' @export
-get_KL <- function(sample_data, docName='text', index_name='id', labelsName='label', docsType='bbc',
-                   stem=T, ngrams=1, trimPct=0.0001, minDocFreq=2, idfWeight=F, n_extreme=50, iter=100){
+get_KL <- function(sample_data, doc_name='text', index_name='id', labelsName='label', docsType='bbc',
+                   stem=T, ngrams=1, trimPct=0.0001, min_doc_freq=2, idfWeight=F, n_extreme=50, iter=100){
   # get KL divergence from the word-distribution from unsupervised EM
   # to the empirical word-distribution
 
-  sample_dfm <- get_dfm(docs=sample_data, docName=docName, index_name=index_name,
+  sample_dfm <- get_dfm(docs=sample_data, doc_name=doc_name, index_name=index_name,
                         stem=stem, ngrams=ngrams, trimPct=trimPct,
-                        minDocFreq=minDocFreq, idfWeight=idfWeight)
+                        min_doc_freq=min_doc_freq, idfWeight=idfWeight)
   # empirical distribution of words
-  empdist <- get_empirical_dist(docs=sample_data, docsType=docsType, docName=docName,
+  empdist <- get_empirical_dist(docs=sample_data, docsType=docsType, doc_name=doc_name,
                                 index_name=index_name, labelsName=labelsName,
                                 stem=stem, trimPct=trimPct,
-                                minDocFreq=minDocFreq, idfWeight=idfWeight,
+                                min_doc_freq=min_doc_freq, idfWeight=idfWeight,
                                 ngram=ngram, n_extreme=n_extreme, dfm=sample_dfm)
   empdist <- as.data.frame(empdist$word_data)
   rownames(empdist) <- empdist$term
@@ -558,7 +560,7 @@ get_KL <- function(sample_data, docName='text', index_name='id', labelsName='lab
 
 
 #' @export
-check_extreme_words_inlabel <- function(data, docsType, docName, index_name, labelsName, dfm,
+check_extreme_words_inlabel <- function(data, docsType, doc_name, index_name, labelsName, dfm,
                                         n_extreme=10, iter=1000, sample_size=100, sampling_method=NULL){
 
 
@@ -574,7 +576,7 @@ check_extreme_words_inlabel <- function(data, docsType, docName, index_name, lab
 
   # get extreme words
   emp_dist <- get_empirical_dist(docs=data,
-                                 docsType=docsType, docName=docName, index_name=index_name, labelsName=labelsName,
+                                 docsType=docsType, doc_name=doc_name, index_name=index_name, labelsName=labelsName,
                                  n_extreme=n_extreme, dfm=dfm)
   extreme_neg <- emp_dist$extreme_words_neg
   extreme_pos <- emp_dist$extreme_words_pos

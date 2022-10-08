@@ -7,7 +7,7 @@
 get_empirical_dist(
   docs,
   docsType,
-  docName,
+  doc_name,
   index_name,
   labelsName,
   n_extreme = 50,

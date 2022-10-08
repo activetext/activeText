@@ -7,7 +7,7 @@
 check_extreme_words_inlabel(
   data,
   docsType,
-  docName,
+  doc_name,
   index_name,
   labelsName,
   dfm,

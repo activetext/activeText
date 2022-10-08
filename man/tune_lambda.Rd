@@ -7,7 +7,7 @@
 tune_lambda(
   docs,
   docName = "text",
-  indexName = "id",
+  index_name = "id",
   labelsName = "label",
   n_clusters = c(2),
   maxQuery = 1,
@@ -24,7 +24,7 @@ tune_lambda(
 
 \item{docName}{String; name of variable for document text.}
 
-\item{indexName}{String; name of variable for corpus index.}
+\item{index_name}{String; name of variable for corpus index.}
 
 \item{labelsName}{String; name of variable for document labels.}
 

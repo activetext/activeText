@@ -6,7 +6,7 @@
 \usage{
 run_unsupervised_EM(
   docs,
-  docName,
+  doc_name,
   docsType,
   index_name,
   labelsName,
@@ -15,7 +15,7 @@ run_unsupervised_EM(
   extreme_words_neg = NULL,
   stem = T,
   trimPct = 0,
-  minDocFreq = 1,
+  min_doc_freq = 1,
   idfWeight = F,
   ngrams = 1,
   n_extreme = 50,

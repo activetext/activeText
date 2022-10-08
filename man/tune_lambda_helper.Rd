@@ -8,7 +8,7 @@ tune_lambda_helper(
   i,
   docs,
   docName,
-  indexName,
+  index_name,
   n_cluster,
   labelsName,
   initSize,
@@ -28,7 +28,7 @@ tune_lambda_helper(
 
 \item{docName}{String; name of variable for document text.}
 
-\item{indexName}{String; name of variable for corpus index.}
+\item{index_name}{String; name of variable for corpus index.}
 
 \item{n_cluster}{Int; number of clusters.}
 

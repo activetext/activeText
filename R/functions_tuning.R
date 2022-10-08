@@ -8,7 +8,7 @@
 #' @export
 tune_lambda_helper <- function(i, docs,
                                docName,
-                               indexName,
+                               index_name,
                                n_cluster,
                                labelsName,
                                initSize,
@@ -26,7 +26,7 @@ tune_lambda_helper <- function(i, docs,
 #' @param i Iteration number.
 #' @param docs Dataframe for courpus.
 #' @param docName String; name of variable for document text.
-#' @param indexName String; name of variable for corpus index.
+#' @param index_name String; name of variable for corpus index.
 #' @param n_cluster Int; number of clusters.
 #' @param labelsName String; name of variable for document labels.
 #' @param initSize Int; number of docs to initialize model with.
@@ -48,7 +48,7 @@ tune_lambda_helper <- function(i, docs,
   res <- active_EM(docs=docs,
                    docName=docName,
                    n_cluster=n_cluster,
-                   indexName=indexName,
+                   index_name=index_name,
                    labelsName=labelsName,
                    weight=lambda,
                    handLabel=F,
@@ -68,7 +68,7 @@ tune_lambda_helper <- function(i, docs,
   res_docs <- res$out_docs
   res_docs$pred_class <- ifelse(res_docs$Class_2 >= 0.5, 1, 0)
   cf <- get_conf_matrix(docs = res$out_docs,
-                      labelsName = "label", indexName = "id")
+                      labelsName = "label", index_name = "id")
   TP <- cf[2,2]
   TN <- cf[1,1]
   FP <- cf[1,2]
@@ -97,7 +97,7 @@ find_best_ncluster_lambda <- function(result){
 #' @export
 tune_lambda <- function(docs,
                         docName = "text",
-                        indexName = "id",
+                        index_name = "id",
                         labelsName ='label',
                         n_clusters = c(2),
                         maxQuery = 1,
@@ -112,7 +112,7 @@ tune_lambda <- function(docs,
 #'
 #' @param docs Dataframe for courpus.
 #' @param docName String; name of variable for document text.
-#' @param indexName String; name of variable for corpus index.
+#' @param index_name String; name of variable for corpus index.
 #' @param labelsName String; name of variable for document labels.
 #' @param n_clusters vec; sequence of number of clusters to be tested.
 #' @param lambdas vec; sequence of lambda values to test.
@@ -209,7 +209,7 @@ tune_lambda <- function(docs,
                                                          docs = rbind(test_cont[[i]],
                                                                       train_cont[[i]]),
                                                          docName = docName,
-                                                         indexName = indexName,
+                                                         index_name = index_name,
                                                          labelsName = labelsName,
                                                          maxQuery = maxQuery,
                                                          maxActive = active_num,
@@ -233,7 +233,7 @@ tune_lambda <- function(docs,
                                                     docs = rbind(test_cont[[i]],
                                                                  train_cont[[i]]),
                                                     docName = docName,
-                                                    indexName = indexName,
+                                                    index_name = index_name,
                                                     labelsName = labelsName,
                                                     maxQuery = maxQuery,
                                                     maxActive = active_num,
