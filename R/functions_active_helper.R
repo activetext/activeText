@@ -444,8 +444,8 @@ get_dfm <- function(docs, doc_name = "text", index_name = "id", stem=T, ngrams=1
     if (ngrams == 1) {
         dfm <- docs %>%
             quanteda::corpus(docid_field=index_name, text_field=doc_name) %>%
-            quanteda::dfm(tolower=T, remove_numbers=T, remove_url=T, remove_twitter=T,
-                          remove_punct=T, remove_hyphens=T, stem=stem, ngrams=ngrams) %>%
+            quanteda::dfm(tolower=T, remove_numbers=T, remove_url=T,
+                          remove_punct=T, stem=stem) %>%
             {if (removeStopWords) quanteda::dfm_remove(., quanteda::stopwords(source="stopwords-iso")) else .} %>%
             quanteda::dfm_select(min_nchar=minChar) %>%
             quanteda::dfm_trim(min_termfreq=trimPct, min_docfreq=min_doc_freq,
@@ -454,8 +454,8 @@ get_dfm <- function(docs, doc_name = "text", index_name = "id", stem=T, ngrams=1
     } else {
         dfm <- docs %>%
             quanteda::corpus(docid_field=index_name, text_field=doc_name) %>%
-            quanteda::tokens(remove_numbers=T, remove_url=T, remove_twitter=T,
-                             remove_punct=T, remove_hyphens=T) %>%
+            quanteda::tokens(remove_numbers=T, remove_url=T,
+                             remove_punct=T) %>%
             quanteda::tokens_tolower() %>%
             {if (removeStopWords) quanteda::tokens_remove(., quanteda::stopwords(source="stopwords-iso")) else .} %>%
             {if (stem) quanteda::tokens_wordstem(.) else .} %>%
