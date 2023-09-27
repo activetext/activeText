@@ -196,7 +196,7 @@ get_word_prob <- function(.D, .E, .beta=NA, .fixed_words=NULL){
     # denominator: V + the number of words in the training docs with class j
 
     # if .beta is not provided, use (2,2,...) as beta
-    if (length(beta) == 1 && is.na(.beta)){
+    if (length(beta) == 1 && all(is.na(.beta))){
       .beta <- rep(2, ncol(.D))
 
       # If we want to use multi cluster, fix this vector and make it to a matrix
@@ -228,7 +228,7 @@ get_word_prob_NB <- function(.D_train, .C_train, .beta = NA){
   # if .beta is not provided, use (2,2,...) as beta
 
 
-  if (length(beta) == 1 && is.na(.beta)){
+  if (length(beta) == 1 && all(is.na(.beta))){
     .beta <- rep(2, ncol(.D_train))
     # NOTE:
     # If we want to use multi cluster, fix this vector and make it to a matrix
