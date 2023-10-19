@@ -21,7 +21,7 @@ Authors:
 -   [Ted Enamorado](https://www.tedenamorado.com/)
 -   [Yuki Shiraito](https://shiraito.github.io)
 
-Recommended citation: Mitchell Bosley, Saki Kuzushima, Ted Enamorado, Yuki Shiraito. 2022. [“Improving Probabilistic Models in Text Classification via Active Learning”](https://arxiv.org/abs/2202.02629). arXiv preprint arXiv:2202.02629
+Recommended citation: Mitchell Bosley, Saki Kuzushima, Ted Enamorado, Yuki Shiraito. 2022. [“Improving Probabilistic Models in Text Classification via Active Learning”](https://arxiv.org/abs/2202.02629). Preprint, arXiv:2202.02629.
 
 
 
