@@ -7,6 +7,7 @@
 
 #' @importFrom dplyr "%>%"
 
+
 #' @export
 clean_data <- function(docs, n_class, doc_name, index_name, labels_name=NULL,
                        filters=NULL, add_index=T, add_filter=T, keep_labels=F) {
@@ -81,6 +82,131 @@ clean_data <- function(docs, n_class, doc_name, index_name, labels_name=NULL,
 }
 
 #' @export
+classify_gui <- function(options, documents, selections=NA) {
+  #' @title           GUI to select labels.
+  #' @description     Helps select labels.
+  #'
+  #' @param labels       [vector]    Vector of string labels
+  #' @param documents_with_header [vector]    Vector of string texts.
+  #' 
+  # library(tcltk)
+  if (is.na(selections)) {
+    selections <- rep(NA, length(documents))
+  }
+  index <- 1
+
+  # Create a top-level window
+  top <- tcltk::tktoplevel()
+  tcltk::tkwm.title(top, "Active Text")
+
+  tcltk::tkframe(top)
+  document_frame <- tcltk::tkframe(top)
+
+  #Scrollbars
+  scr.d <- tcltk::tkscrollbar(document_frame, repeatinterval=4,command=function(...) tcltk::tkyview(t.d,...))
+
+  #Listboxes
+  t.d <- tcltk::tktext(document_frame, yscrollcommand=function(...) tcltk::tkset(scr.d,...), width=100,background="white")
+
+  #Place them on the window
+  label <- tcltk::tklabel(document_frame,text=paste("[ Document", index, "of", length(documents), "]"))
+  tcltk::tkgrid(label)
+  tcltk::tkgrid(t.d, scr.d)
+
+  tcltk::tkinsert(t.d, "end", documents[index])
+  tcltk::tkconfigure(t.d, state="disabled")
+  tcltk::tkgrid.configure(scr.d,rowspan=1,sticky="nsw")
+
+  tcltk::tkpack(document_frame, anchor = "w")
+
+  # Function to handle radio button selection
+  radio_callback <- function(option) {
+    tcltk::tclvalue(exclusive_var) <- option
+    selections[index] <<- strtoi(option)
+    print(paste("RADIO BUTTON", "index", index, "has option", selections[index], "selected"))
+  }
+
+  button_callback <- function(button_text) {
+    cat("Button clicked:", button_text, "\n")
+    # Add your code for button actions here
+  }
+
+# Function to trigger "Right Arrow" button action
+  trigger_right_arrow <- function(event) {
+    if (!is.na(selections[index])) {
+        index <<- index + 1
+        if (index > length(documents)) {
+        print("BREAK")
+        ## TODO
+        tcltk::tkdestroy(top)
+        }
+
+        print(paste("RIGHT ARROW BUTTON", "index", index, "has option", selections[index], "selected"))
+
+        tcltk::tkconfigure(label, text = paste("[ Document", index, "of", length(documents), "]"))
+        tcltk::tkconfigure(t.d, state="normal")
+        tcltk::tkdelete(t.d, "1.0","end")
+        tcltk::tkinsert(t.d, "end", documents[index])
+        tcltk::tkconfigure(t.d, state="disabled")
+
+        if (!is.na(selections[index])) {
+            tcltk::tclvalue(exclusive_var) <<- selections[index]
+        } else {
+            tcltk::tclvalue(exclusive_var) <<- -1
+        }
+    }
+  }
+
+  # Function to trigger "Left Arrow" button action
+  trigger_left_arrow <- function(event) {
+    if (index != 1) {
+      index <<- index - 1
+    }
+    print(paste("LEFT ARROW BUTTON", "index", index, "has option", selections[index], "selected"))
+
+    tcltk::tkconfigure(label, text = paste("[ Document", index, "of", length(documents), "]"))
+    tcltk::tkconfigure(t.d, state="normal")
+    tcltk::tkdelete(t.d, "1.0","end")
+    tcltk::tkinsert(t.d, "end", documents[index])
+    tcltk::tkconfigure(t.d, state="disabled")
+    exclusive_var <- tcltk::tclVar(0)
+    tcltk::tclvalue(exclusive_var) <<- selections[index]
+  }
+  # Create a variable to control exclusive selection
+  exclusive_var <- tcltk::tclVar(0)
+  if (!is.na(selections[index])) {
+    tcltk::tclvalue(exclusive_var) <- selections[index]
+  } 
+  frame <- tcltk::tkframe(top)
+
+  # Create radio buttons for the dynamic options using lapply
+  radio_buttons <- lapply(seq_along(options), function(i) {
+    tkradio <- tcltk::tkradiobutton(frame, text = options[i], variable = exclusive_var, value = i, command = function() radio_callback(i))
+    tcltk::tkpack(tkradio, anchor = "w")
+  })
+
+  # # Pack the frame
+  tcltk::tkpack(frame, side = "top")
+
+  # Create a frame for the buttons at the bottom
+  button_frame <- tcltk::tkframe(top)
+
+  # Create left and right arrow buttons
+  left_arrow_button <- tcltk::tkbutton(button_frame, text = "←", command = function() trigger_left_arrow())
+  save_button <- tcltk::tkbutton(button_frame, text = "Save", command = function() button_callback("Save"))
+  right_arrow_button <- tcltk::tkbutton(button_frame, text = "→", command = function() trigger_right_arrow())
+
+  # Pack the buttons
+  tcltk::tkpack(left_arrow_button, side = "left")
+  tcltk::tkpack(save_button, side = "left")
+  tcltk::tkpack(right_arrow_button, side = "left")
+  tcltk::tkpack(button_frame, side = "bottom")
+  # Start the Tk event loop
+  tcltk::tkwait.window(top)
+  return(selections)
+}
+
+#' @export
 query_label <- function(docs, label_id_vec, n_class, labels, doc_name,
                         index_name, labels_name=NULL,
                         active_iter=NULL, maxIter=NULL,
@@ -112,48 +238,30 @@ query_label <- function(docs, label_id_vec, n_class, labels, doc_name,
 #'                               labels for the documents in `label_id_vec`.
 
   if (handlabel) {
+    selections <- rep(NA, length(label_id_vec))
 
+    ## Active learning iteration tracker
+    if (!is.null(active_iter) & !is.null(maxIter)) {
+      header <- "" # paste("\n[ Iteration", active_iter, "of max", maxIter, "]")
+    }
+    text_vector = c()
     for (i in 1:length(label_id_vec)) {
+      to_label_text <- docs %>%
+        dplyr::filter(!!dplyr::sym(index_name) == label_id_vec[i]) %>%
+        dplyr::pull(!!dplyr::sym(doc_name))
+      text_vector <- c(text_vector, paste(header, to_label_text, sep="\n\n"))
+    }
 
-      ## lab_row <- docs %>%
-      ##   dplyr::filter(!!dplyr::sym(index_name) == label_id_vec[i])
-      ## lab <- ifelse(
-      ##   is.null(labels_name), NA,
-      ##   lab_row %>% pull(!!dplyr::sym(labels_name))
-      ## )
-      lab <- NA
+    ## Menu-based classification
+    selections <- classify_gui(labels, text_vector)
 
-      if (is.na(lab)) {
-
-        ## Document tracker
-        header <- paste("[ Document", i, "of", length(label_id_vec), "]")
-
-        ## Active learning iteration tracker
-        if (!is.null(active_iter) & !is.null(maxIter)) {
-          active_header <- paste("\n[ Iteration", active_iter, "of max", maxIter, "]")
-          header <- paste(active_header, header, sep = "\n")
-        }
-
-        to_label_text <- docs %>%
-          dplyr::filter(!!dplyr::sym(index_name) == label_id_vec[i]) %>%
-          dplyr::pull(!!dplyr::sym(doc_name))
-
-        ## Menu-based classification
-        selection <- menu(labels, title=paste(header, to_label_text, sep="\n\n"))
-        ident <- which(docs[[index_name]] == label_id_vec[i])
-
-      } else {
-
-        selection <- lab
-        ident <- which(docs[[index_name]] == label_id_vec[i])
+    for (i in seq_along(selections)){
+      ident <- which(docs[[index_name]] == label_id_vec[i])
+      ## Update document matrix based on classifications
+      for (j in 1:n_class){
+        docs[ident, paste("Class", j, sep="_") ] <- 0
       }
-
-        ## Update document matrix based on classifications
-        for (j in 1:n_class){
-          docs[ident, paste("Class", j, sep="_") ] <- 0
-        }
-        docs[ident, paste("Class", selection, sep="_")] <- 1
-
+      docs[ident, paste("Class", selections[i], sep="_")] <- 1
     }
 
   } else {
