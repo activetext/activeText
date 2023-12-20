@@ -15,7 +15,9 @@ query_label(
   active_iter = NULL,
   maxIter = NULL,
   handlabel = TRUE,
-  metadata_vars = NA
+  metadata_vars = NA,
+  already_selected = NA,
+  param_to_save = NA
 )
 }
 \arguments{
@@ -46,10 +48,13 @@ process.}
 \item{handlabel}{[logical]   Boolean logical value indicating whether to initiate user-input script.
 If set to \code{FALSE}, and if \code{labels_name} is provided, the script
 queries the document label directly from the column denoted by \code{labels_name}.}
+
+\item{param_to_save}{[list]    List of variables to save if user chooses to.}
 }
 \value{
-[matrix]     Structured matrix of labeled and unlabeled documents, updated with
-                              labels for the documents in `label_id_vec`.
+[matrix] or [list]     If finishes to completion, structured matrix of labeled and unlabeled documents, updated with
+                              labels for the documents in `label_id_vec`. Otherwise, a list of already hand labeled values
+                              to save.
 }
 \description{
 Queries documents for classification by oracle.

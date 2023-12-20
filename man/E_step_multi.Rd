@@ -39,5 +39,8 @@ Vectorize matrices, stack them, apply logsumexp,
 then reshape into matrix form.
 }
 \description{
-E step with multiple cluster
+E step of the EM algorithm with multiple clusters
+it has to take .D_train (labeled documents) too because
+for negative label documents, we have to estimate cluster probability
+TO BE UPDATED
 }

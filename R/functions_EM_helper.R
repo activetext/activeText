@@ -55,7 +55,7 @@ E_step_multi <- function(.C_train, .D_train, .D_test,
                          .X_c = NA, .X_b = NA,
                          .class_prob, .word_prob,
                          .mu = NA, .psi = NA, .sig = NA){
-  
+  #' @description 
   #' E step of the EM algorithm with multiple clusters
   #' it has to take .D_train (labeled documents) too because
   #' for negative label documents, we have to estimate cluster probability
