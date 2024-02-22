@@ -106,7 +106,7 @@ classification_gui <- function(options, documents, param_to_save, title, selecti
   # Create a frame for the scrollbar and document text
   tcltk::tkframe(top)
   document_frame <- tcltk::tkframe(top)
-  text_width = 100
+  text_width = 120
   scrollbar <- tcltk::tkscrollbar(document_frame, repeatinterval=4,command=function(...) tcltk::tkyview(document_text,...))
   document_text <- tcltk::tktext(document_frame, yscrollcommand=function(...) tcltk::tkset(scrollbar,...), width=text_width, background="white")
   tcltk::tkconfigure(document_text, font = "-size 12 -family Times")
@@ -145,12 +145,13 @@ classification_gui <- function(options, documents, param_to_save, title, selecti
   # Function to trigger "Right Arrow" button action
   trigger_right_arrow <- function(event) {
     if (!is.na(selections[index])) {
+        tcltk::tkconfigure(left_arrow_button, foreground = "black", font = "-size 12 -family Helvetica")
+
         index <<- index + 1
         if (index > length(documents)) {
           tcltk::tkdestroy(top)
           return(selections)
         }
-        tcltk::tkconfigure(left_arrow_button, foreground = "black", font = "-size 12 -family Helvetica")
 
         tcltk::tkconfigure(label, text = paste("[ Document", index, "of", length(documents), "]"))
         tcltk::tkconfigure(document_text, state="normal")
@@ -175,7 +176,11 @@ classification_gui <- function(options, documents, param_to_save, title, selecti
     }
     if (index == 1) {
       tcltk::tkconfigure(left_arrow_button, foreground = "gray", font = "-size 12 -family Helvetica")
+    } else {
+      tcltk::tkconfigure(left_arrow_button, foreground = "black", font = "-size 12 -family Helvetica")
     }
+    tcltk::tkconfigure(right_arrow_button, foreground = "black", font = "-size 12 -family Helvetica")
+
     tcltk::tkconfigure(label, text = paste("[ Document", index, "of", length(documents), "]"))
     tcltk::tkconfigure(document_text, state="normal")
     tcltk::tkdelete(document_text, "1.0","end")
