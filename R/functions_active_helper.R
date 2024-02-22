@@ -7,8 +7,6 @@
 
 #' @importFrom dplyr "%>%"
 
-
-#' @export
 clean_data <- function(docs, n_class, doc_name, index_name, labels_name=NULL,
                        filters=NULL, add_index=T, add_filter=T, keep_labels=F) {
 
@@ -81,14 +79,14 @@ clean_data <- function(docs, n_class, doc_name, index_name, labels_name=NULL,
     return(docs)
 }
 
-#' @export
-classification_gui <- function(options, documents, param_to_save, selections=NA) {
+classification_gui <- function(options, documents, param_to_save, title, selections=NA) {
   #' @title           GUI to select labels.
-  #' @description     Helps select labels.
+  #' @description     Helps user easily select labels.
   #'
   #' @param options       [vector]    Vector of string labels
   #' @param documents [vector]    Vector of string texts.
   #' @param param_to_save [list]    List of variables to save if user chooses to.
+  #' @param title [string]    The title of the GUI
   #' @param selections [vector]   Already labeled documents
   
   # Create empty selections vector if no documents are already labeled
@@ -102,22 +100,26 @@ classification_gui <- function(options, documents, param_to_save, selections=NA)
 
   # Create a top-level window
   top <- tcltk::tktoplevel()
-  tcltk::tkwm.title(top, "Active Text")
+
+  tcltk::tkwm.title(top, title)
 
   # Create a frame for the scrollbar and document text
   tcltk::tkframe(top)
   document_frame <- tcltk::tkframe(top)
+  text_width = 100
   scrollbar <- tcltk::tkscrollbar(document_frame, repeatinterval=4,command=function(...) tcltk::tkyview(document_text,...))
-  document_text <- tcltk::tktext(document_frame, yscrollcommand=function(...) tcltk::tkset(scrollbar,...), width=100,background="white")
+  document_text <- tcltk::tktext(document_frame, yscrollcommand=function(...) tcltk::tkset(scrollbar,...), width=text_width, background="white")
+  tcltk::tkconfigure(document_text, font = "-size 12 -family Times")
 
-  #Place them on the window
+  #Place them on the windows
   label <- tcltk::tklabel(document_frame,text=paste("[ Document", index, "of", length(documents), "]"))
+  tcltk::tkconfigure(label, font = "-size 12 -family Helvetica")
   tcltk::tkgrid(label)
   tcltk::tkgrid(document_text, scrollbar)
-  tcltk::tkinsert(document_text, "end", paste(strwrap(documents[index], width = 100), collapse = "\n"))
+  tcltk::tkinsert(document_text, "end", gsub("^\\n+", "", paste(strwrap(documents[index], width = text_width), collapse = "\n")))
   tcltk::tkconfigure(document_text, state="disabled")
-  tcltk::tkgrid.configure(scrollbar,rowspan=1,sticky="nsw")
-  tcltk::tkpack(document_frame, anchor = "w")
+  tcltk::tkgrid.configure(scrollbar,rowspan=1,sticky="nsew")
+  tcltk::tkpack(document_frame, anchor = "w", expand = TRUE)
   
   
 
@@ -126,6 +128,7 @@ classification_gui <- function(options, documents, param_to_save, selections=NA)
     tcltk::tclvalue(exclusive_var) <- option
     # Save selection
     selections[index] <<- strtoi(option)
+    tcltk::tkconfigure(right_arrow_button, foreground = "black", font = "-size 12 -family Helvetica")
   }
 
   # Save selections
@@ -147,17 +150,20 @@ classification_gui <- function(options, documents, param_to_save, selections=NA)
           tcltk::tkdestroy(top)
           return(selections)
         }
+        tcltk::tkconfigure(left_arrow_button, foreground = "black", font = "-size 12 -family Helvetica")
 
         tcltk::tkconfigure(label, text = paste("[ Document", index, "of", length(documents), "]"))
         tcltk::tkconfigure(document_text, state="normal")
         tcltk::tkdelete(document_text, "1.0","end")
-        tcltk::tkinsert(document_text, "end", paste(strwrap(documents[index], width = 100), collapse = "\n"))
+        tcltk::tkinsert(document_text, "end", gsub("^\\n+", "", paste(strwrap(documents[index], width = text_width), collapse = "\n")))
         tcltk::tkconfigure(document_text, state="disabled")
 
         if (!is.na(selections[index])) {
             tcltk::tclvalue(exclusive_var) <<- selections[index]
+            tcltk::tkconfigure(right_arrow_button, foreground = "black", font = "-size 12 -family Helvetica")
         } else {
             tcltk::tclvalue(exclusive_var) <<- -1
+            tcltk::tkconfigure(right_arrow_button, foreground = "gray", font = "-size 12 -family Helvetica")
         }
     }
   }
@@ -167,10 +173,13 @@ classification_gui <- function(options, documents, param_to_save, selections=NA)
     if (index != 1) {
       index <<- index - 1
     }
+    if (index == 1) {
+      tcltk::tkconfigure(left_arrow_button, foreground = "gray", font = "-size 12 -family Helvetica")
+    }
     tcltk::tkconfigure(label, text = paste("[ Document", index, "of", length(documents), "]"))
     tcltk::tkconfigure(document_text, state="normal")
     tcltk::tkdelete(document_text, "1.0","end")
-    tcltk::tkinsert(document_text, "end", paste(strwrap(documents[index], width = 100), collapse = "\n"))
+    tcltk::tkinsert(document_text, "end", gsub("^\\n+", "", paste(strwrap(documents[index], width = text_width), collapse = "\n")))
     tcltk::tkconfigure(document_text, state="disabled")
     exclusive_var <- tcltk::tclVar(0)
     tcltk::tclvalue(exclusive_var) <<- selections[index]
@@ -186,6 +195,7 @@ classification_gui <- function(options, documents, param_to_save, selections=NA)
   # Create radio buttons for each label option
   radio_buttons <- lapply(seq_along(options), function(i) {
     tkradio <- tcltk::tkradiobutton(frame, text = options[i], variable = exclusive_var, value = i, command = function() radio_callback(i))
+    tcltk::tkconfigure(tkradio, font = "-size 12 -family Helvetica")
     tcltk::tkpack(tkradio, anchor = "w")
   })
 
@@ -197,18 +207,45 @@ classification_gui <- function(options, documents, param_to_save, selections=NA)
   left_arrow_button <- tcltk::tkbutton(button_frame, text = "←", command = function() trigger_left_arrow())
   save_button <- tcltk::tkbutton(button_frame, text = "Save", command = function() save_button_callback())
   right_arrow_button <- tcltk::tkbutton(button_frame, text = "→", command = function() trigger_right_arrow())
+  if (!is.na(selections[index])) {
+      tcltk::tkconfigure(right_arrow_button, foreground = "black", font = "-size 12 -family Helvetica")
+  } else {
+      tcltk::tkconfigure(right_arrow_button, foreground = "gray", font = "-size 12 -family Helvetica")
+  }
+  if (index == 1) {
+    tcltk::tkconfigure(left_arrow_button, foreground = "gray", font = "-size 12 -family Helvetica")
+  } else {
+    tcltk::tkconfigure(left_arrow_button, font = "-size 12 -family Helvetica")
+  }
+  tcltk::tkconfigure(save_button, font = "-size 12 -family Helvetica")
   tcltk::tkpack(left_arrow_button, side = "left")
   tcltk::tkpack(save_button, side = "left")
   tcltk::tkpack(right_arrow_button, side = "left")
   tcltk::tkpack(button_frame, side = "bottom")
+  
+
+  resize <- FALSE
+  resize_function <- function(event) {
+    if (resize) {
+      new_width <- floor(as.numeric(tcltk::tcl("winfo", "width", top))/8) - 2
+      text_width <<- new_width * 1.25
+      new_height <- floor((as.numeric(tcltk::tcl("winfo", "height", top))/16)*0.66) # floor(as.numeric(tcltk::tcl("winfo", "height", top))/80) - 5
+      tcltk::tkconfigure(document_text, state="normal")
+      tcltk::tkconfigure(document_text, width = new_width, height=new_height)
+      tcltk::tkdelete(document_text, "1.0","end")
+      tcltk::tkinsert(document_text, "end", gsub("^\\n+", "", paste(strwrap(documents[index], width = text_width), collapse = "\n")))
+      tcltk::tkconfigure(document_text, state="disabled")
+    }
+  }
+  Sys.sleep(0.1)
+  tcltk::tkbind(top, "<Configure>", resize_function)
+  resize <- TRUE
 
   # Start the Tk event loop
   tcltk::tkwait.window(top)
-
   return(selections)
 }
 
-#' @export
 query_label <- function(docs, label_id_vec, n_class, labels, doc_name,
                         index_name, labels_name=NULL,
                         active_iter=NULL, maxIter=NULL,
@@ -256,7 +293,8 @@ query_label <- function(docs, label_id_vec, n_class, labels, doc_name,
     }
 
     ## Menu-based classification
-    selections <- classification_gui(labels, text_vector, param_to_save, already_selected)
+    title <- paste("Active Text (Iteration ", active_iter, " of ", maxIter, ")", sep = "")
+    selections <- classification_gui(labels, text_vector, param_to_save, title, already_selected)
 
     # If there are any selections that are null, need to save
     if (any(is.na(selections))) {
@@ -477,7 +515,6 @@ convert_beta_tbl <- function(beta_tbl) {
   return(beta_mtx)
 }
 
-#' @export
 get_index <- function(docs, index_name) {
 
     #' @title Get Index
@@ -496,7 +533,6 @@ get_index <- function(docs, index_name) {
 
 }
 
-#' @export
 get_clusters <- function(n_cluster) {
 
     #' @title Get Clusters
@@ -514,7 +550,6 @@ get_clusters <- function(n_cluster) {
     return(clusters)
 }
 
-#' @export
 get_classes <- function(n_class) {
 
     #' @title Get Classes
@@ -533,7 +568,6 @@ get_classes <- function(n_class) {
 }
 
 
-#' @export
 get_dfm <- function(docs, doc_name = "text", index_name = "id", stem=T, ngrams=1, trimPct=0.0001, min_doc_freq=2, idfWeight=F, removeStopWords=T, minChar=4) {
 
     #' @title Get Document Feature Matrix
@@ -558,6 +592,7 @@ get_dfm <- function(docs, doc_name = "text", index_name = "id", stem=T, ngrams=1
 
     # If ngrams > 1, this if condition handles removal of stopwords properly.
     if (ngrams == 1) {
+      suppressWarnings(
         dfm <- docs %>%
             quanteda::corpus(docid_field=index_name, text_field=doc_name) %>%
             quanteda::dfm(tolower=T, remove_numbers=T, remove_url=T,
@@ -567,6 +602,7 @@ get_dfm <- function(docs, doc_name = "text", index_name = "id", stem=T, ngrams=1
             quanteda::dfm_trim(min_termfreq=trimPct, min_docfreq=min_doc_freq,
                                termfreq_type="prop") %>%
             {if (idfWeight) quanteda::dfm_tfidf(.) else .}
+      )
     } else {
         dfm <- docs %>%
             quanteda::corpus(docid_field=index_name, text_field=doc_name) %>%
@@ -586,7 +622,6 @@ get_dfm <- function(docs, doc_name = "text", index_name = "id", stem=T, ngrams=1
 
 }
 
-#' @export
 split_dfm <- function(dfm, splitIndex) {
 
     #' @title Splits Document Term Matrix into two parts.
@@ -853,7 +888,6 @@ log_ratio_sample <- function(docs, out, dfm, mu, tau, max_query, edge, regions) 
 
 }
 
-#' @export
 get_uncertain_docs <- function(docs, bound, max_query,
                                index_name, hand_labeled_index, force_list=F,
                                query_type="basic_entropy",
@@ -1035,7 +1069,6 @@ get_uncertain_docs <- function(docs, bound, max_query,
 
 }
 
-#' @export
 matchCluster2Class <- function(output, count, n_cluster, n_class) {
   pos_class <- output[, n_cluster]
   neg_class <- 1 - pos_class
@@ -1046,7 +1079,6 @@ matchCluster2Class <- function(output, count, n_cluster, n_class) {
   return(obj)
 }
 
-#' @export
 match_clusters_to_docs <- function(docs, EMoutput, index_name, n_cluster) {
 #' @title Match Multicluster EM Output to Document Matrix
 #' @description Matches the output of multicluster EM to the document corpus matrix.
@@ -1114,13 +1146,13 @@ match_EM_to_docs <- function(docs, EMoutput, classes, doc_name, index_name,
 
 }
 
-#' @export
 get_term_sparsity <- function(dfm) {
     freq_doc <- quanteda::docfreq(dfm)
     n <- quanteda::ndoc(dfm)
 
     return(freq_doc / n)
 }
+
 active_initial_messages <- function(n_cluster, query_type) {
   #' Prints initial messages for active sampling, if needed.
   if (n_cluster == 2 & query_type %in% c("margin_cluster", "basic_entropy_cluster")) {
@@ -1240,7 +1272,6 @@ check_lr_convergence <- function(output, count, log_ratio_threshold, log_ratio_c
   }
 }
 
-#' @export
 agg_helper_convert <- function(model_preds,
                                n_cluster_collapse_type = "simple") {
 #' @title Aggregation Helper
@@ -1266,7 +1297,6 @@ agg_helper_convert <- function(model_preds,
   return(model_preds)
 }
 
-#' @export
 get_mean_mpe <- function(mod, dfm, val_data, labels_name = "label", index_name = "id",
                     n_cluster_collapse_type = "simple", n_cluster) {
 #' @title Get Mean Prediction Error Singular
@@ -1292,7 +1322,6 @@ get_mean_mpe <- function(mod, dfm, val_data, labels_name = "label", index_name =
   return(mean_mpe)
 }
 
-#' @export
 get_mean_mpes <- function(dfms, models, val_data, n_cluster) {
 #' @title Get Mean Prediction Error
 #' @description gets mean mpes across a list of dfms and list of models of equal length
@@ -1305,7 +1334,6 @@ get_mean_mpes <- function(dfms, models, val_data, n_cluster) {
   return(mean_mpes)
 }
 
-#' @export
 get_alpha_m <- function(mean_mpe) {
 #' @title Get alpha_m
 #' @description gets normalized model weight
@@ -1313,7 +1341,6 @@ get_alpha_m <- function(mean_mpe) {
   return(alpha_m)
 }
 
-#' @export
 get_model_weights <- function(dfms, models, val_data, n_cluster) {
 #' @title Get Model Weights
 #' @description calculates the weights that each model recieves and normalize
@@ -1323,7 +1350,6 @@ get_model_weights <- function(dfms, models, val_data, n_cluster) {
   return(model_weights)
 }
 
-#' @export
 get_weighted_prediction <- function(model_preds, model_weights,
                                     index_name = "id",
                                     labels_name = "label") {
@@ -1341,7 +1367,6 @@ get_weighted_prediction <- function(model_preds, model_weights,
   return(model_preds_w)
 }
 
-#' @export
 choose_best_model <- function(model_preds, model_weights, index_name = "id") {
 #' @title Choose best model.
 #' @description gets predictions from single best model
@@ -1359,8 +1384,6 @@ choose_best_model <- function(model_preds, model_weights, index_name = "id") {
   return(best_model_preds)
 }
 
-
-#' @export
 aggregate_model_predictions <- function(pred_lst,
                                         dfms = NULL, models = NULL,
                                         val_data = NULL, n_cluster,
@@ -1430,7 +1453,6 @@ aggregate_model_predictions <- function(pred_lst,
   return(out_lst)
 }
 
-#' @export
 gen_results_tbl <- function(include_out_stats, metadata, max_iters, model_name) {
 #' @title Generate Results Table
 #' @description generates an object for storing model results
@@ -1464,7 +1486,6 @@ gen_results_tbl <- function(include_out_stats, metadata, max_iters, model_name) 
   return(res_obj)
 }
 
-#' @export
 update_results <- function(include_out_stats, res_obj,
                            agg_output_in, agg_output_out,
                            hl_index, i, time_sec) {
@@ -1583,7 +1604,6 @@ update_docs <- function(docs_old, new_data, classes = get_classes(n_class)) {
   }
 }
 
-#' @export
 #' @title Get Keywords
 #' @description Gets keywords to feed to `active_EM()`,
 #' depending on on scheme type.
