@@ -257,7 +257,7 @@ query_label <- function(docs, label_id_vec, n_class, labels, doc_name,
 
     ## Menu-based classification
     selections <- classification_gui(labels, text_vector, param_to_save, already_selected)
-    
+
     # If there are any selections that are null, need to save
     if (any(is.na(selections))) {
       return(NA)
