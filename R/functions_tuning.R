@@ -5,7 +5,6 @@
 ## Author: Mitchell Bosley
 ##################################################
 
-#' @export
 tune_lambda_helper <- function(i, docs,
                                docName,
                                index_name,
@@ -94,7 +93,6 @@ find_best_ncluster_lambda <- function(result){
   return(best)
 }
 
-#' @export
 tune_lambda <- function(docs,
                         docName = "text",
                         index_name = "id",
@@ -256,7 +254,6 @@ tune_lambda <- function(docs,
               best = best))
 }
 
-#' @export
 find_best_ncluster_lambda <- function(out, show_all = FALSE){
   if (!show_all) {
     best <- out %>%
@@ -274,7 +271,6 @@ find_best_ncluster_lambda <- function(out, show_all = FALSE){
   return(best)
 }
 
-#' @export
 get_tune_lambda_fig <- function(out, k) {
 #' @title Gets Tune Lambda Figure
 #' @description Gets visualization from output of `tune_lambda` function.
@@ -295,7 +291,6 @@ get_tune_lambda_fig <- function(out, k) {
   return(plot)
 }
 
-#' @export
 get_cross_validate_key <- function(docs, k) {
   rsample::vfold_cv()
   docs_split_ls <- docs %>%
