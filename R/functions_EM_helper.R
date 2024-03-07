@@ -50,7 +50,6 @@ E_step <- function(.D_test, .X_c = NA, .X_b = NA,
   return(out)
 }
 
-#' @export
 E_step_multi <- function(.C_train, .D_train, .D_test,
                          .X_c = NA, .X_b = NA,
                          .class_prob, .word_prob,
@@ -217,7 +216,6 @@ get_word_prob <- function(.D, .E, .beta=NA, .fixed_words=NULL){
     return(out)
 }
 
-#' @export
 get_word_prob_NB <- function(.D_train, .C_train, .beta = NA){
   #' @title Get Word Probability (Naive Bayes)
 	#' @description get word probability for NB step

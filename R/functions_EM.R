@@ -5,7 +5,6 @@
 ## Author: Saki Kuzushima
 ##################################################
 
-#' @export
 EM <- function(.D_train = NULL, .C_train = NULL, .D_test, .n_class = 2,
                .lambda = 0.1, .max_iter = 100, .alpha = 0.1, .lazy_eval = F,
                .counter_on = T, .active_iter = NULL, .maxactive_iter = NULL,

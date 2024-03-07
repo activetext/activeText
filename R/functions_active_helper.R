@@ -83,11 +83,11 @@ classification_gui <- function(options, documents, param_to_save, title, selecti
   #' @title           GUI to select labels.
   #' @description     Helps user easily select labels.
   #'
-  #' @param options       [vector]    Vector of string labels
+  #' @param options       [vector]    Vector of string labels.
   #' @param documents [vector]    Vector of string texts.
   #' @param param_to_save [list]    List of variables to save if user chooses to.
-  #' @param title [string]    The title of the GUI
-  #' @param selections [vector]   Already labeled documents
+  #' @param title [string]    The title of the GUI that appears at the top of the window.
+  #' @param selections [vector]   Already labeled documents.
   
   # Create empty selections vector if no documents are already labeled
   index <- 1
@@ -96,39 +96,50 @@ classification_gui <- function(options, documents, param_to_save, title, selecti
   } else {
     index <- which(is.na(selections))[1]
   }
-  
 
   # Create a top-level window
   top <- tcltk::tktoplevel()
 
+  # Set the title
   tcltk::tkwm.title(top, title)
 
-  # Create a frame for the scrollbar and document text
+  # Create the top frame and the frame for the document text with a scrollbar
   tcltk::tkframe(top)
   document_frame <- tcltk::tkframe(top)
-  text_width = 120
-  scrollbar <- tcltk::tkscrollbar(document_frame, repeatinterval=4,command=function(...) tcltk::tkyview(document_text,...))
-  document_text <- tcltk::tktext(document_frame, yscrollcommand=function(...) tcltk::tkset(scrollbar,...), width=text_width, background="white")
-  tcltk::tkconfigure(document_text, font = "-size 12 -family Times")
 
-  #Place them on the windows
+  # This changes how wide the window is initially
+  text_width = 110
+
+  # Create scrollbar and document text
+  scrollbar <- tcltk::tkscrollbar(document_frame, repeatinterval=4,command=function(...) tcltk::tkyview(document_text,...))
+  document_text <- tcltk::tktext(document_frame, 
+    yscrollcommand=function(...) tcltk::tkset(scrollbar,...), width=text_width, height=20, background="white")
+  
+  # This is the font of the document text. If you choose to change this, you will need to change several other values too.
+  # I labeled those values as "FONT DEPENDENT" -- more info is in the note in the resize_function function
+  tcltk::tkconfigure(document_text, font = "-size 14 -family Times")
+
+  # Place them on the windows
   label <- tcltk::tklabel(document_frame,text=paste("[ Document", index, "of", length(documents), "]"))
   tcltk::tkconfigure(label, font = "-size 12 -family Helvetica")
   tcltk::tkgrid(label)
   tcltk::tkgrid(document_text, scrollbar)
-  tcltk::tkinsert(document_text, "end", gsub("^\\n+", "", paste(strwrap(documents[index], width = text_width), collapse = "\n")))
+
+  # The 1.1 scalar is FONT DEPENDENT
+  tcltk::tkinsert(document_text, "end", gsub("^\\n+", "", 
+    paste(strwrap(documents[index], width = text_width*1.1), collapse = "\n")))
   tcltk::tkconfigure(document_text, state="disabled")
   tcltk::tkgrid.configure(scrollbar,rowspan=1,sticky="nsew")
   tcltk::tkpack(document_frame, anchor = "w", expand = TRUE)
-  
-  
 
   # Function to handle document label from radio buttons
   radio_callback <- function(option) {
     tcltk::tclvalue(exclusive_var) <- option
     # Save selection
     selections[index] <<- strtoi(option)
+    # When you make a document selection, the next arrow shows as black, indicating user can proceed next
     tcltk::tkconfigure(right_arrow_button, foreground = "black", font = "-size 12 -family Helvetica")
+    tcltk::tkconfigure(right_arrow_button, state = "active")
   }
 
   # Save selections
@@ -138,55 +149,77 @@ classification_gui <- function(options, documents, param_to_save, title, selecti
       file_path = file.path(param_to_save$save_directory, param_to_save$save_file_name)
     }
     saveRDS(c(list("selections" = selections), param_to_save),file=file_path)
-    # jsonlite::write_json(c(list("selections" = selections), param_to_save), file_path)
     print(paste("Saved progress to file", file_path))
   }
 
   # Function to trigger "Right Arrow" button action
   trigger_right_arrow <- function(event) {
+    # Can only proceed if a radio button is selected
     if (!is.na(selections[index])) {
-        tcltk::tkconfigure(left_arrow_button, foreground = "black", font = "-size 12 -family Helvetica")
-
         index <<- index + 1
+
+        # Since user went forward one, left button is black to show user can go back
+        tcltk::tkconfigure(left_arrow_button, foreground = "black", font = "-size 12 -family Helvetica")
+        tcltk::tkconfigure(left_arrow_button, state = "active")
+
+        # Close the window if no more documents to label
         if (index > length(documents)) {
           tcltk::tkdestroy(top)
           return(selections)
         }
 
+        # Replace text on the window with the new document
         tcltk::tkconfigure(label, text = paste("[ Document", index, "of", length(documents), "]"))
         tcltk::tkconfigure(document_text, state="normal")
         tcltk::tkdelete(document_text, "1.0","end")
-        tcltk::tkinsert(document_text, "end", gsub("^\\n+", "", paste(strwrap(documents[index], width = text_width), collapse = "\n")))
+        tcltk::tkinsert(document_text, "end", gsub("^\\n+", "", 
+          paste(strwrap(documents[index], width = text_width), collapse = "\n")))
         tcltk::tkconfigure(document_text, state="disabled")
 
+        # If there is a radio button already selected, indicate can go forward
         if (!is.na(selections[index])) {
+            # Show selected option is already selected
             tcltk::tclvalue(exclusive_var) <<- selections[index]
             tcltk::tkconfigure(right_arrow_button, foreground = "black", font = "-size 12 -family Helvetica")
+            tcltk::tkconfigure(right_arrow_button, state = "active")
+        # If there is noradio button selected, indicate cannot go forward
         } else {
             tcltk::tclvalue(exclusive_var) <<- -1
             tcltk::tkconfigure(right_arrow_button, foreground = "gray", font = "-size 12 -family Helvetica")
+            tcltk::tkconfigure(right_arrow_button, state = "disabled")
         }
     }
   }
 
   # Function to trigger "Left Arrow" button action
   trigger_left_arrow <- function(event) {
+    # Can't go back if on the first document
     if (index != 1) {
       index <<- index - 1
     }
+
+    # If on the first document, indicate can't go back
     if (index == 1) {
       tcltk::tkconfigure(left_arrow_button, foreground = "gray", font = "-size 12 -family Helvetica")
+      tcltk::tkconfigure(left_arrow_button, state = "disabled")
+    # If not on the first document, indicate can go back
     } else {
       tcltk::tkconfigure(left_arrow_button, foreground = "black", font = "-size 12 -family Helvetica")
+      tcltk::tkconfigure(left_arrow_button, state = "active")
     }
+    # Since user went back, indicate they are able to go forward
     tcltk::tkconfigure(right_arrow_button, foreground = "black", font = "-size 12 -family Helvetica")
+    tcltk::tkconfigure(right_arrow_button, state = "active")
 
+    # Replace text on the window with the new document
     tcltk::tkconfigure(label, text = paste("[ Document", index, "of", length(documents), "]"))
     tcltk::tkconfigure(document_text, state="normal")
     tcltk::tkdelete(document_text, "1.0","end")
-    tcltk::tkinsert(document_text, "end", gsub("^\\n+", "", paste(strwrap(documents[index], width = text_width), collapse = "\n")))
+    tcltk::tkinsert(document_text, "end", gsub("^\\n+", "", 
+      paste(strwrap(documents[index], width = text_width), collapse = "\n")))
     tcltk::tkconfigure(document_text, state="disabled")
     exclusive_var <- tcltk::tclVar(0)
+    # Show selected option is already selected
     tcltk::tclvalue(exclusive_var) <<- selections[index]
   }
 
@@ -195,30 +228,47 @@ classification_gui <- function(options, documents, param_to_save, title, selecti
   if (!is.na(selections[index])) {
     tcltk::tclvalue(exclusive_var) <- selections[index]
   } 
-  frame <- tcltk::tkframe(top)
 
-  # Create radio buttons for each label option
+  # Create and pack a frame for the radio buttons.
+  radio_button_frame <- tcltk::tkframe(top)
+  tcltk::tkpack(radio_button_frame, side = "top", anchor = "center")
+
+  # Create a list of radio buttons for each option
+  radio_buttons_list <- vector("list", length(options))
   radio_buttons <- lapply(seq_along(options), function(i) {
-    tkradio <- tcltk::tkradiobutton(frame, text = options[i], variable = exclusive_var, value = i, command = function() radio_callback(i))
-    tcltk::tkconfigure(tkradio, font = "-size 12 -family Helvetica")
-    tcltk::tkpack(tkradio, anchor = "w")
+    radio_button <- tcltk::tkradiobutton(radio_button_frame, text = options[i], 
+      variable = exclusive_var, value = i, command = function() radio_callback(i))
+    tcltk::tkconfigure(radio_button, font = "-size 12 -family Helvetica")
+    radio_buttons_list[[i]] <<- radio_button
   })
 
-  # Pack the frame with the radio buttons
-  tcltk::tkpack(frame, side = "top")
+  # Dynamically place radio buttons in a grid with up to 4 buttons in a row.
+  num_cols <- 4
+  button_width <- 1 / num_cols
+  for (i in 1:length(options)) {
+    row <- floor((i - 1) / num_cols)
+    col <- (i - 1) %% num_cols
+    tcltk::tkgrid(radio_buttons_list[[i]], row = row, column = col, padx = 5, pady = 5, sticky = "w")
+  }
 
-  # Create and pack a frame for the arrow and save buttons at the bottom
+  # For each row of radio buttons, remove a row of document text
+  subtract_text_row <- length(options) %% num_cols
+
+  # Create and pack a frame for the next, back, and save buttons at the bottom
   button_frame <- tcltk::tkframe(top)
-  left_arrow_button <- tcltk::tkbutton(button_frame, text = "←", command = function() trigger_left_arrow())
+  left_arrow_button <- tcltk::tkbutton(button_frame, text = "Back", command = function() trigger_left_arrow()) # ←
   save_button <- tcltk::tkbutton(button_frame, text = "Save", command = function() save_button_callback())
-  right_arrow_button <- tcltk::tkbutton(button_frame, text = "→", command = function() trigger_right_arrow())
+  right_arrow_button <- tcltk::tkbutton(button_frame, text = "Next", command = function() trigger_right_arrow()) # →
   if (!is.na(selections[index])) {
       tcltk::tkconfigure(right_arrow_button, foreground = "black", font = "-size 12 -family Helvetica")
+      tcltk::tkconfigure(right_arrow_button, state = "active")
   } else {
       tcltk::tkconfigure(right_arrow_button, foreground = "gray", font = "-size 12 -family Helvetica")
+      tcltk::tkconfigure(right_arrow_button, state = "disabled")   
   }
   if (index == 1) {
     tcltk::tkconfigure(left_arrow_button, foreground = "gray", font = "-size 12 -family Helvetica")
+    tcltk::tkconfigure(left_arrow_button, state = "disabled")   
   } else {
     tcltk::tkconfigure(left_arrow_button, font = "-size 12 -family Helvetica")
   }
@@ -228,21 +278,39 @@ classification_gui <- function(options, documents, param_to_save, title, selecti
   tcltk::tkpack(right_arrow_button, side = "left")
   tcltk::tkpack(button_frame, side = "bottom")
   
-
+ 
+  # Resize the widgets in the window if the user manually resizes the window
   resize <- FALSE
   resize_function <- function(event) {
+    
     if (resize) {
-      new_width <- floor(as.numeric(tcltk::tcl("winfo", "width", top))/8) - 2
-      text_width <<- new_width * 1.25
-      new_height <- floor((as.numeric(tcltk::tcl("winfo", "height", top))/16)*0.66) # floor(as.numeric(tcltk::tcl("winfo", "height", top))/80) - 5
+      # NOTE: Some of these values are a bit arbitrary, but work well with the font size.
+      # winfo height and width returns pixel units, but tkconfigure width and height use character units
+      # that are dependent on both font size and screen resolution. This conversion should be possible
+      # in theory since we can calculate average character width/height for a given font size in a 
+      # specific screen resolution, but any formulas I tried did not work for some reason. Instead,
+      # I settled on these scalars through manual testing different values. 
+      # This means that if you change the font size, you must change these "FONT DEPENDENT" values too.
+      
+      # The 9 is FONT DEPENDENT, and 3 is supposed to leave room for the scrollbar
+      new_width <- floor(as.numeric(tcltk::tcl("winfo", "width", top))/9) - 3
+      # 1.1 is FONT DEPENDENT
+      text_width <<- new_width * 1.1
+      # 0.8/22 is FONT DEPENDENT
+      new_height <- floor((as.numeric(tcltk::tcl("winfo", "height", top)))*0.8/22) - subtract_text_row
       tcltk::tkconfigure(document_text, state="normal")
       tcltk::tkconfigure(document_text, width = new_width, height=new_height)
       tcltk::tkdelete(document_text, "1.0","end")
-      tcltk::tkinsert(document_text, "end", gsub("^\\n+", "", paste(strwrap(documents[index], width = text_width), collapse = "\n")))
+      tcltk::tkinsert(document_text, "end", gsub("^\\n+", "", 
+        paste(strwrap(documents[index], width = text_width), collapse = "\n")))
       tcltk::tkconfigure(document_text, state="disabled")
     }
   }
-  Sys.sleep(0.1)
+  # NOTE: There is a slight bug that causes the window to rapidly decrease in width upon creation;
+  # This is unfortunately a race condition dependent on how fast the window loads, but this 
+  # 1 second delay makes it so it's a rare occurrence. The TRUE/FALSE logic also is intended to mitigate
+  # this, but it's debatable whether it's adding any value.
+  Sys.sleep(1)
   tcltk::tkbind(top, "<Configure>", resize_function)
   resize <- TRUE
 
@@ -1209,7 +1277,7 @@ generate_lambda_vec <- function(lambda_decay, lambda, rate, iters,
 tune_lambda_in_active <- function(docs, index_name, hand_labeled_index, n_cluster,
                                   tune_lambda_range, tune_lambda_prop_init,
                                   tune_lambda_parallel, tune_lambda_k, seed) {
-  #' Tunes lambda value at each iteraction, if enabled
+  #' Tunes lambda value at each iteraction, if active
   tuning_docs <- docs %>%
     dplyr::filter(!!dplyr::sym(index_name)
                   %in% hand_labeled_index[[count]])

@@ -8,7 +8,6 @@
 #' @importFrom foreach "%dopar%"
 #' @importFrom foreach "%do%"
 
-#' @export
 get_conf_matrix <- function(docs, labelsName = "label",
                             index_name = "id", labeledIndex = NULL,
                             levels = c(0, 1), n_class = 2,
@@ -37,7 +36,6 @@ get_conf_matrix <- function(docs, labelsName = "label",
 
 }
 
-#' @export
 get_classification_accuracy <- function(conf_matrix) {
 
     total <- 0
@@ -48,7 +46,6 @@ get_classification_accuracy <- function(conf_matrix) {
     return(total / sum(conf_matrix))
 }
 
-#' @export
 get_precision_binary <- function(conf_matrix) {
 
   if (sum(conf_matrix[ , 2]) == 0) {
@@ -61,7 +58,6 @@ get_precision_binary <- function(conf_matrix) {
 
 }
 
-#' @export
 get_recall_binary <- function(conf_matrix) {
 
   if (sum(conf_matrix[ , 2]) == 0) {
@@ -74,7 +70,6 @@ get_recall_binary <- function(conf_matrix) {
   return(recall)
 }
 
-#' @export
 get_F1_binary <- function(conf_matrix, precision=NULL, recall=NULL) {
 
   if (is.null(precision) == T){
@@ -95,7 +90,6 @@ get_F1_binary <- function(conf_matrix, precision=NULL, recall=NULL) {
 
 }
 
-#' @export
 get_precision_binary_weighted <- function(conf_matrix, FP_w) {
   
   precision <- conf_matrix[2,2] / (conf_matrix[2,2] + FP_w)
@@ -104,7 +98,6 @@ get_precision_binary_weighted <- function(conf_matrix, FP_w) {
   
 }
 
-#' @export
 get_recall_binary_weighted <- function(conf_matrix, FN_w) {
   
   if (sum(conf_matrix[ , 2]) == 0) {
@@ -119,11 +112,6 @@ get_recall_binary_weighted <- function(conf_matrix, FN_w) {
   return(recall)
 }
 
-
-
-
-
-#' @export
 get_conf_matrix_weight <- function(docs, labelsName, index_name=NULL,
                                    labeledIndex=NULL, levels=c(0, 1),
                                    n_class=2, n_cluster=2, useLabeled=T) {
@@ -163,7 +151,7 @@ get_conf_matrix_weight <- function(docs, labelsName, index_name=NULL,
   return(list(conf_matrix=conf_matrix, FP_w=FP_weighted, FN_w=FN_weighted))
   
 }
-#' @export
+
 get_empirical_dist <- function(docs, docsType, doc_name, index_name, labelsName, n_extreme=50,
      dfm=NULL, extreme_type="abs_diff", ...) {
 
@@ -278,7 +266,6 @@ get_empirical_dist <- function(docs, docsType, doc_name, index_name, labelsName,
                 neg_classification_pct_out=neg_classification_pct_out))
 }
 
-#' @export
 get_fixed_words_mtx <- function(data) {
 
     #' @title Get a Matrix of Fixed Words and Class Probabilities.
@@ -296,7 +283,6 @@ get_fixed_words_mtx <- function(data) {
     return(out2)
 }
 
-#' @export
 run_unsupervised_EM <- function(docs, doc_name, docsType, index_name, labelsName, dfm=NULL,
                                 extreme_words_pos=NULL, extreme_words_neg=NULL,
                                 stem=T, trimPct=0, min_doc_freq=1, idfWeight=F,
@@ -386,7 +372,6 @@ run_unsupervised_EM <- function(docs, doc_name, docsType, index_name, labelsName
 
 }
 
-#' @export
 # KL divergence function
 KL <- function(p, q){
 
@@ -400,7 +385,6 @@ KL <- function(p, q){
     return(sum(exp(p)*(p - q)))
 }
 
-#' @export
 tuning_algorithm <- function(docs, doc_name, index_name, labelsName, measure="accuracy", max_runs=30, seed=123,
                              stem=c(F, T), ngrams=c(1:3), trimPct=c(0, 0.0001, 0.001, 0.01),
                              min_doc_freq=c(1, 2, 3), idfWeight=c(F, T), removeStopWords=c(F, T), minChar=1:4,
@@ -513,8 +497,6 @@ tuning_algorithm <- function(docs, doc_name, index_name, labelsName, measure="ac
 
 }
 
-
-#' @export
 get_KL <- function(sample_data, doc_name='text', index_name='id', labelsName='label', docsType='bbc',
                    stem=T, ngrams=1, trimPct=0.0001, min_doc_freq=2, idfWeight=F, n_extreme=50, iter=100){
   # get KL divergence from the word-distribution from unsupervised EM
@@ -558,8 +540,6 @@ get_KL <- function(sample_data, doc_name='text', index_name='id', labelsName='la
   return(res)
 }
 
-
-#' @export
 check_extreme_words_inlabel <- function(data, docsType, doc_name, index_name, labelsName, dfm,
                                         n_extreme=10, iter=1000, sample_size=100, sampling_method=NULL){
 
@@ -657,8 +637,6 @@ check_extreme_words_inlabel <- function(data, docsType, doc_name, index_name, la
   return(list(pos=sample_extreme_pos_df, neg=sample_extreme_neg_df))
 }
 
-
-#' @export
 plot_hist_extreme <- function(extreme_df, docsType){
   # use with check_extreme_words_inlabel function
 
@@ -678,8 +656,6 @@ plot_hist_extreme <- function(extreme_df, docsType){
   return(res)
 }
 
-
-#' @export 
 balancing_data <- function(data, pos_ratio, size = nrow(data), seed=1990){
   
   #' @title Create a (un)balanced dataset with specified size and ratio of positive documents
@@ -718,7 +694,6 @@ balancing_data <- function(data, pos_ratio, size = nrow(data), seed=1990){
   }
 }
 
-#' @export
 sample_data <- function(data, n=NULL, pos_prob){
   #' @title get a sample of dataset with a specific proportion of positive documents.
 
@@ -753,9 +728,6 @@ sample_data <- function(data, n=NULL, pos_prob){
   
 }
 
-
-
-#' @export
 reshapedocs <- function(output){
   #' @title reshape docs object such that the prediction at each iteration is stored
   #' @param "output" is the entire output (not "output" element of the list) from the run_models_fast function
@@ -807,7 +779,6 @@ reshapedocs_helper <- function(output_model){
   return(alldocs_acrossiter)
 }
 
-#' @export
 get_results_matrix <- function(out, out_sample = FALSE, model_name) {
 #' @title Get Results Matrix for active_EM Output.
 #' @description Translates activeEM() output object
@@ -878,7 +849,6 @@ get_results_matrix <- function(out, out_sample = FALSE, model_name) {
   return(obj)
 }
 
-#' @export
 get_label_prop_fig <- function(out, dataset_name, index_name = "id") {
 #' @title Get Label Proportion Figure
 #' @description Produces a figure that proportion of positive to negative
@@ -908,7 +878,6 @@ get_label_prop_fig <- function(out, dataset_name, index_name = "id") {
   return(list(plot = plot, results = results))
 }
 
-#' @export
 process_metadata <- function(md) {
 #' @title Process Model Metadata
 #' @description Exports a caption object for figures based on
@@ -937,7 +906,6 @@ process_metadata <- function(md) {
   return(cap_obj)
 }
 
-#' @export
 integer_breaks <- function(n = 5, ...) {
   fxn <- function(x) {
     breaks <- floor(pretty(x, n, ...))
@@ -947,7 +915,6 @@ integer_breaks <- function(n = 5, ...) {
   return(fxn)
 }
 
-#' @export
 get_predict_prop_fig <- function(out, dataset_name, index_name = "id",
                                  doc_labels = FALSE, metadata = TRUE,
                                  arrange_y_axis = FALSE, out_sample = TRUE,
@@ -1071,7 +1038,6 @@ get_predict_prop_fig <- function(out, dataset_name, index_name = "id",
   return(plot)
 }
 
-#' @export
 read_doc <- function(docs, index_name = "id", id_val) {
   doc <- docs %>%
     filter(!!dplyr::sym(index_name) == id_val) %>%

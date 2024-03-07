@@ -211,8 +211,8 @@ active_label_wrapper <- function(docs,
                           ...) {
 
   if (is.na(save_file_name)) {
-    current_time <- format(Sys.time(), format = "%Y.%m.%d_H.%H_M.%M_S.%S")
-    save_file_name <- paste("Iter_", 0, "_time_", current_time, ".RDS", sep = "")
+    current_time <- format(Sys.time(), format = "%Y-%m-%d_%H-%M")
+    save_file_name <- paste("Iter-", 0, "_", current_time, ".RDS", sep = "")
   }
   ## Needed if the user saves progress for later
   param_to_save = list( "docs" = docs,
