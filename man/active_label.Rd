@@ -7,57 +7,14 @@
 active_label(
   docs,
   labels = c(0, 1),
-  doc_name = "text",
-  index_name = "id",
-  labels_name = NULL,
   lambda = 1,
   n_class = 2,
   n_cluster = 2,
-  init_index = NULL,
-  handlabel = T,
-  bound = 0,
   max_active = 5,
   init_size = 10,
   max_query = 10,
-  lazy_eval = FALSE,
-  force_list = FALSE,
-  counter_on = TRUE,
-  query_type = "basic_entropy",
-  which_out_test = NULL,
-  seed = NA,
-  fixed_words = NULL,
-  dfms = NULL,
-  export_all_em = FALSE,
-  export_all = FALSE,
-  log_ratio_threshold = 0.001,
-  log_ratio_conv_type = "maximand",
-  mu = 1e-04,
-  tau = 1e-04,
-  regions = "both",
-  lambda_decay = FALSE,
-  ld_rate = 0.2,
-  tune_lambda = FALSE,
-  tune_lambda_prop_init = 0.1,
-  tune_lambda_range = seq(0, 1, 0.1),
-  tune_lambda_k = 10,
-  tune_lambda_parallel = TRUE,
-  NB_init = TRUE,
-  export_val_stats_only = FALSE,
-  model_name = "Model",
-  agg_type = "best",
-  n_cluster_collapse_type = "simple",
-  beta = NA,
-  active_eta_query = FALSE,
-  keywords_list = list(NA, NA),
-  keywords_scheme = NA,
-  true_eta = NA,
-  gamma = NA,
-  validation_mode = FALSE,
-  cont_metadata_varnames = NA,
-  binary_metadata_varnames = NA,
-  contextual_varnames = NA,
-  mc_iter = NA,
-  ...
+  save_file_name = NA,
+  save_directory = NA
 )
 }
 \arguments{
@@ -67,26 +24,10 @@ row has index values and a nested Matrix of word tokens.}
 \item{labels}{[vector]     Vector of character strings indicating classification
 options for labeling.}
 
-\item{doc_name}{[character]  Character string indicating the variable in 'docs'
-that denotes the text of the documents to be classified.}
-
-\item{index_name}{[character]  Character string indicating the variable in 'docs'
-that denotes the index value of the document to be classified.}
-
-\item{labels_name}{[character]  Character string indicating the variable in \code{docs}
-that denotes the already known labels of the documents.
-By default, value is set to \code{NULL}.}
-
 \item{lambda}{[numeric]    Numeric value between 0 and 1. Used to weight unlabeled
 documents.}
 
 \item{n_class}{[numeric]    Number of classes to be considered.}
-
-\item{handlabel}{[logical]    Boolean logical value indicating whether to initiate user-input script.
-If set to \code{FALSE}, and if \code{labels_name} is provided, the script
-queries the document label directly from the column denoted by \code{labels_name}.}
-
-\item{bound}{[numeric]    Minimum bound of entropy to call for additional labelling.}
 
 \item{max_active}{[numeric]    Value of maximum allowed active learning iterations.}
 
@@ -94,102 +35,8 @@ queries the document label directly from the column denoted by \code{labels_name
 
 \item{max_query}{[numeric]    Maximum number of documents queried in each EM iteration.}
 
-\item{lazy_eval}{[logical]    If \code{lazy_eval == T}, convergence is measured by comparing changes
-in log likelihood across model iterations rather than directly computing
-maximand.}
-
-\item{force_list}{[logical]    Switch indicating whether to force the filtering of documents with
-no entropy. Set to \code{FALSE} by default.}
-
-\item{counter_on}{[logical]    Switch indicating whether the progress of each sequence of the EM algorithm
-is reported. By default set to \code{TRUE}.}
-
-\item{query_type}{[string]     String indicating which type of uncertainty sampling to use. Options are \code{"standard_entropy"}
-or \code{"normalized_entropy"}, \code{"tiered_entropy"}, or \code{"tiered_entropy_weighted"}.}
-
-\item{which_out_test}{[vector]     Vector of document index labels used to identify documents to be used for
-out of sample validation of the learned model. Set to \code{NULL} by default.
-If a vector of labels is provided, the function outputs an additional argument
-containing classification likelihoods for all documents identified by the vector.}
-
-\item{seed}{[numeric]    Sets seed for model.}
-
-\item{fixed_words}{[matrix]     Matrix of fixed words with class probabilities, where ncol is the number of classes.}
-
-\item{dfms}{[matrix]     Option to manually supply a dfm from quanteda.}
-
-\item{export_all_em}{[logical]    Switch indicating whether to export model
-If true, the function exports a list of lists containing all predictions.}
-
-\item{export_all}{[logical]    Switch indicating whether to export model predictions from each stage of the algorithm.}
-
-\item{log_ratio_threshold}{[numeric] Threshold at which convergence is declared when using `query_type="log_ratio"`.}
-
-\item{log_ratio_conv_type}{[string] If `query_type="log_ratio"`, this supplies the way that convergence is estimated.
-Set to `maximand` by default.}
-
-\item{mu}{Parameters for error acceptance with `query_type=log_ratio`.}
-
-\item{tau}{Parameters for error acceptaance with `query_type=log_ratio`.}
-
-\item{regions}{[string]     Can be set to "both", "pos", or "neg" to sample from certain regions during log ratio sampling.}
-
-\item{lambda_decay}{[logical]    Determines whether lambda value decays over active learning iterations or not.}
-
-\item{ld_rate}{[float]      If `lambda_decay == TRUE`, sets the rate at which decay occurs.}
-
-\item{tune_lambda}{[logical]    Logical value indictating whether to tune lambda values with cross validation over
-active learning iterations.}
-
-\item{tune_lambda_prop_init}{[numeric] Float value indicating the proportion of documents to label supply
-rather than label with EM during lambda tuning.}
-
-\item{tune_lambda_range}{[vector] Vector of float values, indicating the range of lambda values to search
-over when tuning lambda at each active iteration.}
-
-\item{tune_lambda_k}{[integer] Integer value indicating what k-fold level to cross validate at when
-tuning lambda.}
-
-\item{NB_init}{[boolean] Indicates whether each active iteration should start with a naive step in the EM
-or whether to initialize with model predictions from previous active iteration.}
-
-\item{export_val_stats_only}{Boolean, indicating whether to export validation stats only from model runs.}
-
-\item{model_name}{[string] Model name string for exporting when `export_val_stats_only == TRUE`.}
-
-\item{agg_type}{[string] Indicating how to aggregate model predictions.}
-
-\item{n_cluster_collapse_type}{[string] Indicates how to collapse multiple clusters into binary class.
-By default, set to "simple", which takes the negative class probablity as the difference between the
-positive class probability and 1. Can also be set to "max_neg", which calculates the normalized ratio of
-positive cluster to the largest negative cluster.}
-
-\item{beta}{[numeric] prior parameter for eta}
-
-\item{active_eta_query}{[boolean] Indicates whether to query oracle for eta tuning.}
-
-\item{cont_metadata_varnames}{Vector of continuous metadata varnames}
-
-\item{binary_metadata_varnames}{Vector of binary metadata varnames}
-
-\item{...}{Additional parameters to pass to `get_dfm` and `EM()` and `get_uncertain_docs()`.}
-
-\item{initIndex}{[vector]     Vector that indicates which documents to use to initialize the
-algorithm. By default set to \code{NULL}, which causes a random
-subset of the documents to be selected.}
-
-\item{quantileBreaks}{[vector]   Vector of break points to distinguish entropy zones. The first value is
-the break point between the first and second tier, the second is the
-break point between the second and third tier.}
-
-\item{sampleProps}{[vector]   Vector of sampling proportions for each entropy zone. The first value is
-the proportion of \code{max_query} to be sampled from the high entropy region,
-the second value is the proportion to be sampled from the middle entropy region,
-and the third value is the proportion to be sampled from the lowest entropy region.}
-
-\item{supervise}{[logical]    T if supervised. F is unsupervised.}
-
-\item{contextual_metadata_varnames}{Vector of contextual metadata varnames}
+\item{doc_name}{[character]  Character string indicating the variable in 'docs'
+that denotes the text of the documents to be classified.}
 }
 \value{
 [list]       List containing labeled document matrix, prior weights, word likelihoods, and a vector
