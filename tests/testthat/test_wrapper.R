@@ -8,7 +8,8 @@ set.seed(9937) ## From random.org, 2024/01/01
 ## ---------
 test_that("regression test", {
 
-  mockr::local_mock(classification_gui = function(options, documents, param_to_save, selections) {
+  title <- "NA"
+  mockr::local_mock(classification_gui = function(options, documents, param_to_save, title, selections) {
     # return (c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1));
     return (c(2, 2, 2, 2, 2, 2, 2, 2, 2, 2));
   })

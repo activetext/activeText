@@ -17,7 +17,7 @@ R package for using active learning to classify text documents.
 Authors:
 
 -   [Mitchell Bosley](https://mbosley.github.io)
--   [Saki Kuzushima](https://ksaki.github.io)
+-   [Saki Kuzushima](https://sakikuzushima.github.io/)
 -   [Ted Enamorado](https://www.tedenamorado.com/)
 -   [Yuki Shiraito](https://shiraito.github.io)
 
@@ -44,12 +44,6 @@ devtools::install_github("activetext/activeText", ref="main")
 <a id="org43ecad4"></a>
 
 # Basic Usage
-
-First, start by setting a seed for reproducability.
-
-```R
-set.seed(1990)
-```
 
 For this tutorial, we&rsquo;re going to use the included BBC News dataset, which is comprised of 2225 documents, 417 of which belong to the &ldquo;politics&rdquo; class. Let&rsquo;s take a quick look at the data:
 
@@ -83,7 +77,11 @@ results <- activeText::active_label(
                     )
 ```
 
-By default, the `active_label` function asks the user to label 10 documents per iteration, up to a maximum of 5 iterations, plus a set of documents for initialization of the algorithm. The count of the iteration and the number of documents is indicated in the first two lines of the prompt.
+By default, the `active_label` function asks the user to label 10 documents per iteration, up to a maximum of 5 iterations, plus a set of documents for initialization of the algorithm. The count of the iteration is at the top left of the application. The number of documents is centered right above the document text. There are radio buttons below the document text to label the document. Press save to save the progress so far, next to go to the next document, and back to go to the prior document.
+
+
+![The first document to label.](/data/FirstImage.PNG)
+
 
     [ Iteration 0 of max 5 ]
     [ Document 1 of 10 ]
