@@ -4,11 +4,11 @@ Version: 0.0.0.9000
 Authors@R: 
     c(person(given = "Mitchell",
            family = "Bosley",
-           role = c("aut", "cre"),
+           role = "aut",
            email = "mcbosley@umich.edu"),
     person(given = "Saki",
            family = "Kuzushima",
-           role = c("aut", "cre"),
+           role = "aut",
            email = "skuzushi@umich.edu"),
     person(given = "Ted",
            family = "Enamorado",
@@ -20,7 +20,7 @@ Authors@R:
            email = "shiraito@umich.edu"),
     person(given = "Emily",
            family = "Sallenback",
-           role = "ctb",
+           role = c("ctb", "cre"),
            email = "esallenback@princeton.edu"))
 Description: What the package does (one paragraph).
 License: What license it uses
