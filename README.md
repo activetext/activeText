@@ -21,11 +21,9 @@ Authors:
 -   [Ted Enamorado](https://www.tedenamorado.com/)
 -   [Yuki Shiraito](https://shiraito.github.io)
 
-Recommended citation: ARXIV:
-
+Recommended citation: Mitchell Bosley, Saki Kuzushima, Ted Enamorado, Yuki Shiraito. 2022. "<a id="title" href="https://arxiv.org/abs/2202.02629">Improving Probabilistic Models in Text Classification via Active Learning</a>." Preprint, arXiv:2202.02629.
 
 <a id="org4d5011e"></a>
-
 # Installation
 
 To install `activeText`, you must first install the `devtools` using the following code:
@@ -74,40 +72,22 @@ We&rsquo;re going to use the package&rsquo;s workhorse function, `active_label` 
 results <- activeText::active_label(
                       docs = activeText::bbc_data_all,
                       labels = c("Not Political", "Political"),
+                      seed = 1234
                     )
 ```
 
-By default, the `active_label` function asks the user to label 10 documents per iteration, up to a maximum of 5 iterations, plus a set of documents for initialization of the algorithm. The count of the iteration is at the top left of the application. The number of documents is centered right above the document text. There are radio buttons below the document text to label the document. Press save to save the progress so far, next to go to the next document, and back to go to the prior document.
+A window as shown below will appear. If it does not pop up, check your task bar for an icon wthat looks like a blue feather and click on that. By default, the `active_label` function asks the user to label 10 documents per iteration, up to a maximum of 5 iterations, plus a set of documents for initialization of the algorithm. 
+
+The count of the iteration is at the top left of the application. The number of documents is centered right above the document text. There are radio buttons below the document text to label the document. Press save to save the progress so far, next to go to the next document, and back to go to the prior document.
 
 
 ![The first document to label.](/data/FirstImage.PNG)
 
+After reading the document, the user must then enter select a radio button to continue.
 
-    [ Iteration 0 of max 5 ]
-    [ Document 1 of 10 ]
-    
-    GM in crunch talks on Fiat future
-    
-    Fiat will meet car giant General Motors (GM) on Tuesday in an attempt to reach agreement over the future of the Italian firm's loss-making auto group.
-    
-    Fiat claims that GM is legally obliged to buy the 90% of the car unit it does not already own; GM says the contract, signed in 2000, is no longer valid. Press reports have speculated that Fiat may be willing to accept a cash payment in return for dropping its claim. Both companies want to cut costs as the car industry adjusts to waning demand.
-    
-    The meeting between Fiat boss Sergio Marchionne and GM's Rick Wagoner is due to take place at 1330 GMT in Zurich, according to the Reuters news agency.
-    
-    Mr Marchionne is confident of his firm's legal position, saying in an interview with the Financial Times that GM's argument "has no legs". The agreement in question dates back to GM's decision to buy 20% of Fiat's auto division in 2000. At the time, it gave the Italian firm the right, via a 'put option', to sell the remaining stake to GM. In recent weeks, Fiat has reiterated its claims that this 'put' is still valid and legally binding. However, GM argues that a Fiat share sale made last year, which cut GM's holding to 10%, together with asset sales made by Fiat have terminated the agreement.
-    
-    Selling the Fiat's car-making unit may not prove so simple, analysts say, especially as it is a company that is so closely linked to Italy's industrial heritage. Political and public pressure may well push the two firms to reach a compromise. "We are not expecting Fiat to exercise its put of the auto business against an unwilling GM at this point," brokerage Merrill Lynch said in a note to investors, adding that any legal battle would be protracted and damaging to the business. "As far as we are aware, the Agnelli family, which indirectly controls at least 30% of Fiat, has not given a firm public indication that it wants to sell the auto business. "Fiat may be willing to cancel the 'put' in exchange for money."
-    
-    
-    1: Not Political
-    2: Political
-    
-    Selection: Enter an item from the menu, or 0 to exit
-    Selection: _
+The user will continue to be prompted for labels until the number of labels per iteration is reached. The window will briefly disappear while the EM algorithm runs.
 
-After reading the above, the user must then enter either `1` for Not Political, `2` for Political, or `0` to exit.
-
-The user will continue to be prompted for labels until the number of labels per iteration is reached. Once this occurs, an Expectation Maximization (EM) algorithm will run until log-likelihood of the posterior distribution of the parameters stops increasing. The progress of the EM algorithm is tracked by a progress bar:
+Once the maximum iterations for labeling is reached, an Expectation Maximization (EM) algorithm will run until log-likelihood of the posterior distribution of the parameters stops increasing. The progress of the EM algorithm is tracked by a progress bar in the terminal:
 
     Active Iter: 1/5 EM Runs: [====>--------------------------------] 14/100 (max)
 
@@ -150,3 +130,9 @@ results$docs |>
     [1] 0.7524249
 
 Thus, after labeling 60 documents using an active learning process, we are correctly classifying 75 percent of the remaining documents.
+
+If the user needs to take a break at any point during the labeling process, the user selects the save button in the window then exits the window. The save file location is printed to the terminal. To return where the user left off, run (with the real name of the saved file):
+
+```R
+activeText::active_label_from_saved("NAME_OF_SAVED_FILE.RDS")
+```

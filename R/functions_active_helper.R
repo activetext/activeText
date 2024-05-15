@@ -668,8 +668,10 @@ get_dfm <- function(docs, doc_name = "text", index_name = "id", stem=T, ngrams=1
       suppressWarnings(
         dfm <- docs %>%
             quanteda::corpus(docid_field=index_name, text_field=doc_name) %>%
+            quanteda::tokens() %>%
             quanteda::dfm(tolower=T, remove_numbers=T, remove_url=T,
-                          remove_punct=T, stem=stem) %>%
+                          remove_punct=T) %>%
+            {if(!is.null(stem)) quanteda::dfm_wordstem(., language=quanteda::quanteda_options("language_stemmer")) else .} %>%
             {if (removeStopWords) quanteda::dfm_remove(., quanteda::stopwords(source="stopwords-iso")) else .} %>%
             quanteda::dfm_select(min_nchar=minChar) %>%
             quanteda::dfm_trim(min_termfreq=trimPct, min_docfreq=min_doc_freq,

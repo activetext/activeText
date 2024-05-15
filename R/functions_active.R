@@ -37,7 +37,9 @@ active_label <- function(docs, # dfms, keywords; export dfms
                           max_query = 10,
                           save_file_name = NA,
                           save_directory = NA,
-                          seed = NA) {
+                          seed = NA,
+                          keywords_list = list(NA, NA),
+                          keywords_scheme = NA) {
 
   ## Check for valid save_directory if inputted
   if (!is.na(save_directory) && !file.exists(save_directory)) {
@@ -55,7 +57,9 @@ active_label <- function(docs, # dfms, keywords; export dfms
                         max_query = max_query,
                         save_file_name = save_file_name,
                         save_directory = save_directory,
-                        seed = seed))
+                        seed = seed,
+                        keywords_list = keywords_list,
+                        keywords_scheme = keywords_scheme))
 }
 
 
