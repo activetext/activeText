@@ -4,7 +4,7 @@ Version: 0.0.0.9000
 Authors@R: 
     c(person(given = "Mitchell",
            family = "Bosley",
-           role = "aut",
+           role = c("aut", "cre"),
            email = "mcbosley@umich.edu"),
     person(given = "Saki",
            family = "Kuzushima",
