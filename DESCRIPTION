@@ -20,7 +20,7 @@ Authors@R:
            email = "shiraito@umich.edu"),
     person(given = "Emily",
            family = "Sallenback",
-           role = "ctb",
+           role = "aut",
            email = "esallenback@princeton.edu"))
 Description: What the package does (one paragraph).
 License: What license it uses
