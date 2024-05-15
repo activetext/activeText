@@ -15,7 +15,8 @@ knitr::opts_chunk$set(
 ```
 
 ```{r}
-install_github("activetext/activeText")
+library(devtools)
+devtools::install_github("activetext/activeText")
 ```
 After installing the package, load it as normal using the `library()` function.
 
@@ -32,7 +33,7 @@ activeText::bbc_data_all
 The BBC news dataset contains 2,215 news articles that are evenly divided between tech, entertainment, sports, politics, and business. All articles that belong to the politics group are labeled as 1, and all other articles are labeled as 0.
 
 ```{r}
-results <- activeText::active_label(
+# results <- activeText::active_label(
                       docs = activeText::bbc_data_all,
                       handlabel = FALSE,
                       labels = c("Not Political", "Political"),
@@ -42,5 +43,5 @@ results <- activeText::active_label(
                       init_size = 1,
                       max_query = 1
                     )
-print(results$docs)
+# print(results$docs)
 ```

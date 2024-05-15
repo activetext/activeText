@@ -1,11 +1,27 @@
 Package: activeText
-Title: What the Package Does (One Line, Title Case)
+Title: a semi-supervised active learning algorithm for text classification.
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
-           role = c("aut", "cre"),
-           email = "first.last@example.com")
+    c(person(given = "Mitchell",
+           family = "Bosley",
+           role = "aut",
+           email = "mcbosley@umich.edu"),
+    person(given = "Saki",
+           family = "Kuzushima",
+           role = "aut",
+           email = "skuzushi@umich.edu"),
+    person(given = "Ted",
+           family = "Enamorado",
+           role = "aut",
+           email = "ted@wustl.edu"),
+    person(given = "Yuki",
+           family = "Shiraito",
+           role = "aut",
+           email = "shiraito@umich.edu"),
+    person(given = "Emily",
+           family = "Sallenback",
+           role = "ctb",
+           email = "esallenback@princeton.edu"))
 Description: What the package does (one paragraph).
 License: What license it uses
 Encoding: UTF-8
@@ -30,7 +46,6 @@ Imports:
     foreach,
     bigstatsr,
     doParallel,
-    gofastr,
     quanteda,
     gtools,
     janitor,
