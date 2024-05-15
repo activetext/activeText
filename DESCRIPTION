@@ -8,7 +8,7 @@ Authors@R:
            email = "mcbosley@umich.edu"),
     person(given = "Saki",
            family = "Kuzushima",
-           role = "aut",
+           role = c("aut", "cre"),
            email = "skuzushi@umich.edu"),
     person(given = "Ted",
            family = "Enamorado",
