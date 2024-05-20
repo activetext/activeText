@@ -226,7 +226,6 @@ get_word_prob_NB <- function(.D_train, .C_train, .beta = NA){
   # if .beta is not provided, use (2,2,...) as beta
 
 
-  print(paste("betas: ", dim(.beta - 1)))
   if (length(beta) == 1 && all(is.na(.beta))){
     .beta <- rep(2, ncol(.D_train))
     # NOTE:
@@ -235,7 +234,7 @@ get_word_prob_NB <- function(.D_train, .C_train, .beta = NA){
     .beta <- cbind(.beta_neg, .beta)
     colnames(.beta) <- NULL # make sure .beta does not show up in the col names
   }
-  
+
 	num <- log(.beta - 1 + Matrix::crossprod(.D_train, .C_train))
 	den <- apply(num, 2, matrixStats::logSumExp)
 	return(sweep(num, 2, den, "-"))
