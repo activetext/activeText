@@ -18,7 +18,6 @@
 #'                                  options for labeling.
 #' @param lambda       [numeric]    Numeric value between 0 and 1. Used to weight unlabeled
 #'                                  documents.
-#' @param n_class      [numeric]    Number of classes to be considered.
 #' @param doc_name      [character]  Character string indicating the variable in 'docs'
 #'                                  that denotes the text of the documents to be classified.
 #' @param max_active    [numeric]    Value of maximum allowed active learning iterations.
@@ -30,16 +29,13 @@
 active_label <- function(docs, # dfms, keywords; export dfms
                           labels=c(0, 1),
                           lambda = 1,
-                          n_class = 2,
-                          n_cluster = 2,
+                          n_cluster = NULL,
                           max_active = 5,
                           init_size = 10,
                           max_query = 10,
                           save_file_name = NA,
                           save_directory = NA,
-                          seed = NA,
-                          keywords_list = list(NA, NA),
-                          keywords_scheme = NA) {
+                          seed = NA) {
 
   ## Check for valid save_directory if inputted
   if (!is.na(save_directory) && !file.exists(save_directory)) {
@@ -50,16 +46,13 @@ active_label <- function(docs, # dfms, keywords; export dfms
   return (active_label_wrapper( docs = docs,
                         labels = labels,
                         lambda = lambda,
-                        n_class = n_class,
                         n_cluster = n_cluster,
                         max_active = max_active,
                         init_size = init_size,
                         max_query = max_query,
                         save_file_name = save_file_name,
                         save_directory = save_directory,
-                        seed = seed,
-                        keywords_list = keywords_list,
-                        keywords_scheme = keywords_scheme))
+                        seed = seed))
 }
 
 
@@ -76,7 +69,6 @@ active_label <- function(docs, # dfms, keywords; export dfms
 #'                                  options for labeling.
 #' @param lambda       [numeric]    Numeric value between 0 and 1. Used to weight unlabeled
 #'                                  documents.
-#' @param n_class      [numeric]    Number of classes to be considered.
 #' @param doc_name      [character]  Character string indicating the variable in 'docs'
 #'                                  that denotes the text of the documents to be classified.
 #' @param index_name    [character]  Character string indicating the variable in 'docs'
@@ -163,8 +155,7 @@ active_label_wrapper <- function(docs,
                           index_name = "id",
                           labels_name = NULL,
                           lambda = 1,
-                          n_class = 2,
-                          n_cluster = 2,
+                          n_cluster = NULL,
                           init_index = NULL,
                           handlabel = TRUE,
                           bound = 0,
@@ -200,7 +191,7 @@ active_label_wrapper <- function(docs,
                           n_cluster_collapse_type = "simple",
                           beta = NA,
                           active_eta_query = FALSE,
-                          keywords_list = list(NA, NA),
+                          keywords_list = NULL,
                           keywords_scheme = NA,
                           true_eta = NA,
                           gamma = NA,
@@ -225,7 +216,6 @@ active_label_wrapper <- function(docs,
                         "index_name" = index_name,
                         "labels_name" = labels_name,
                         "lambda" = lambda,
-                        "n_class" = n_class,
                         "n_cluster" = n_cluster,
                         "init_index" = init_index,
                         "handlabel" = handlabel,
@@ -273,6 +263,40 @@ active_label_wrapper <- function(docs,
                         "mc_iter" = mc_iter,
                         "save_file_name" = save_file_name,
                         "save_directory" = save_directory)
+
+  ## Set n_class and keywords_list based on labels parameter
+  n_class <- length(labels)
+  if (is.null(keywords_list)) {
+    keywords_list <- rep(list(NA), n_class)
+    print(paste("NOTE: The number of classes has been set to ", n_class, " based on `labels.`"))
+  }
+
+  ## Check n_class
+  if (n_class <= 1) {
+    print("ERROR: `labels` must have at least two items in the list (there must be at least two classes to label).")
+    return()
+  }
+
+  ## Set/check n_cluster
+  ## case: n_cluster not set
+  if (is.null(n_cluster)) {
+    n_cluster <- n_class
+    print("NOTE: The number of clusters has been set to the number of classes since n_cluster was not set.")
+  } else {
+    ## case: n_cluster set for binary classification
+    if (n_class == 2) {
+      if (n_cluster < 2) {
+        print("ERROR: For binary classification, n_cluster must be greater than or equal to 2.")
+        return()
+      }
+    ## case: n_cluster set for multi-class classification
+    } else {
+      if (n_cluster != n_class) {
+        print("ERROR: For multi-class classification, n_cluster must equal n_class.")
+        return()
+      }
+    }
+  }
 
   ## Messages
   ## --------------------------------------------------------------------------
