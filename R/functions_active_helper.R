@@ -1317,32 +1317,38 @@ check_lr_convergence <- function(output, count, log_ratio_threshold, log_ratio_c
 }
 
 agg_helper_convert <- function(model_preds,
-                               n_cluster_collapse_type = "simple") {
+                               n_cluster_collapse_type = "simple", n_class = 2) {
 #' @title Aggregation Helper
 #' @description helps aggregation function by collapsing clusters to classes (binary only).
 
-  cluster_names <- colnames(dplyr::select(model_preds, -dfm_id))
-  pos_cluster <- cluster_names[length(cluster_names)]
-  neg_clusters <- cluster_names[1:length(cluster_names) - 1]
+  cluster_names <- colnames(dplyr::select(model_preds, -id, -dfm_id))
+  if (n_class == 2) {
+    pos_cluster <- cluster_names[length(cluster_names)]
+    neg_clusters <- cluster_names[1:length(cluster_names) - 1]
 
-  if (n_cluster_collapse_type == "simple") {
-    model_preds <- model_preds %>%
-      dplyr::mutate(Class_1 = 1 - model_preds[[pos_cluster]],
-                    Class_2 = model_preds[[pos_cluster]])
-  } else if (n_cluster_collapse_type == "max_neg") {
-    ## Get maximum value of negative clusters by row, then normalize
-    model_preds <- model_preds %>%
-      dplyr::mutate(Class_1 = do.call(pmax, model_preds[neg_clusters]),
-                    Class_2 = model_preds[[pos_cluster]],
-                    Class_1 = Class_1 / (Class_1 + Class_2),
-                    Class_2 = Class_2 / (Class_1 + Class_2))
+    if (n_cluster_collapse_type == "simple") {
+      model_preds <- model_preds %>%
+        dplyr::mutate(Class_1 = 1 - model_preds[[pos_cluster]],
+                      Class_2 = model_preds[[pos_cluster]])
+    } else if (n_cluster_collapse_type == "max_neg") {
+      ## Get maximum value of negative clusters by row, then normalize
+      model_preds <- model_preds %>%
+        dplyr::mutate(Class_1 = do.call(pmax, model_preds[neg_clusters]),
+                      Class_2 = model_preds[[pos_cluster]],
+                      Class_1 = Class_1 / (Class_1 + Class_2),
+                      Class_2 = Class_2 / (Class_1 + Class_2))
+    }
+  } else {
+    for (i in 1:n_class) {
+      model_preds <- model_preds %>%
+        dplyr::mutate(!! paste("Class_", as.character(i), sep="") := model_preds[[cluster_names[i]]])
+    }
   }
-
   return(model_preds)
 }
 
 get_mean_mpe <- function(mod, dfm, val_data, labels_name = "label", index_name = "id",
-                    n_cluster_collapse_type = "simple", n_cluster) {
+                    n_cluster_collapse_type = "simple", n_cluster, n_class) {
 #' @title Get Mean Prediction Error Singular
 #' @description gets mean prediction error
   cluster_names <- get_clusters(n_cluster)
@@ -1354,7 +1360,7 @@ get_mean_mpe <- function(mod, dfm, val_data, labels_name = "label", index_name =
   `colnames<-`(cluster_names) %>%
   tibble::as_tibble(rownames = "id")
 
-  class_preds <- agg_helper_convert(out_prediction, n_cluster_collapse_type)
+  class_preds <- agg_helper_convert(out_prediction, n_cluster_collapse_type, n_class)
 
   mean_mpe <- val_data %>%
     dplyr::select(!!dplyr::sym(labels_name), !!dplyr::sym(index_name)) %>%
@@ -1366,14 +1372,14 @@ get_mean_mpe <- function(mod, dfm, val_data, labels_name = "label", index_name =
   return(mean_mpe)
 }
 
-get_mean_mpes <- function(dfms, models, val_data, n_cluster) {
+get_mean_mpes <- function(dfms, models, val_data, n_cluster, n_class) {
 #' @title Get Mean Prediction Error
 #' @description gets mean mpes across a list of dfms and list of models of equal length
   N <- length(dfms)
   mean_mpes <- c()
   for (i in 1:N) {
     mean_mpes[i] <- get_mean_mpe(models[[i]], dfms[[i]], val_data,
-                                 n_cluster = n_cluster)
+                                 n_cluster = n_cluster, n_class)
   }
   return(mean_mpes)
 }
@@ -1385,10 +1391,10 @@ get_alpha_m <- function(mean_mpe) {
   return(alpha_m)
 }
 
-get_model_weights <- function(dfms, models, val_data, n_cluster) {
+get_model_weights <- function(dfms, models, val_data, n_cluster, n_class) {
 #' @title Get Model Weights
 #' @description calculates the weights that each model recieves and normalize
-  mean_mpes <- get_mean_mpes(dfms, models, val_data, n_cluster)
+  mean_mpes <- get_mean_mpes(dfms, models, val_data, n_cluster, n_class)
   model_weights <- sapply(mean_mpes, get_alpha_m)
   model_weights <- model_weights / sum(model_weights)
   return(model_weights)
@@ -1432,7 +1438,7 @@ aggregate_model_predictions <- function(pred_lst,
                                         dfms = NULL, models = NULL,
                                         val_data = NULL, n_cluster,
                                         agg_type = "random",
-                                        n_cluster_collapse_type = "simple") {
+                                        n_cluster_collapse_type = "simple", n_class) {
 
 #' @title Aggregate Model Predictions
 #' @description Processes model predictions according to cluster structure,
@@ -1440,12 +1446,12 @@ aggregate_model_predictions <- function(pred_lst,
 #' used to fit a model.
 
   pred_tbl_in <- agg_helper_convert(
-    pred_lst$model_output_in, n_cluster_collapse_type
+    pred_lst$model_output_in, n_cluster_collapse_type, n_class
   )
 
   if (!is.null(pred_lst$model_output_out)) {
     pred_tbl_out <- agg_helper_convert(
-      pred_lst$model_output_out, n_cluster_collapse_type
+      pred_lst$model_output_out, n_cluster_collapse_type, n_class
     )
   }
 
@@ -1468,7 +1474,7 @@ aggregate_model_predictions <- function(pred_lst,
 
   } else if (agg_type == "best") {
 
-    model_weights <- get_model_weights(dfms, models, val_data, n_cluster)
+    model_weights <- get_model_weights(dfms, models, val_data, n_cluster, n_class)
     in_agg <- choose_best_model(pred_tbl_in, model_weights)
     if (!is.null(pred_lst$model_output_out)) {
       out_agg <- choose_best_model(pred_tbl_out, model_weights)
@@ -1476,7 +1482,7 @@ aggregate_model_predictions <- function(pred_lst,
 
   } else if (agg_type == "weighted_avg") {
 
-    model_weights <- get_model_weights(dfms, models, val_data, n_cluster)
+    model_weights <- get_model_weights(dfms, models, val_data, n_cluster, n_class)
     in_agg <- get_weighted_prediction(pred_tbl_in, model_weights)
     if (!is.null(pred_lst$model_output_out)) {
       out_agg <- get_weighted_prediction(pred_tbl_out, model_weights)

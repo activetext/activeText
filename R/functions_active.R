@@ -511,7 +511,8 @@ active_label_wrapper <- function(docs,
           filter(!!sym(index_name) %in% hand_labeled_index),
         n_cluster = n_cluster,
         agg_type = agg_type,
-        n_cluster_collapse_type = n_cluster_collapse_type
+        n_cluster_collapse_type = n_cluster_collapse_type,
+        n_class
       )
 
       in_docs <- update_docs(in_docs, agg_output$in_agg)
