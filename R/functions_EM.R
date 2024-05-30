@@ -456,7 +456,8 @@ multiEM <- function(.D_train=NULL, .C_train=NULL, .D_test,
       .word_prob = word_prob,
       .mu = `if`(is.na(.cont_metadata_varnames[1]), NA, mu),
       .sig = `if`(is.na(.cont_metadata_varnames[1]), NA, sig),
-      .psi = `if`(is.na(.binary_metadata_varnames[1]), NA, psi)
+      .psi = `if`(is.na(.binary_metadata_varnames[1]), NA, psi),
+      .n_class = .n_class
     )
 
     ## combine known label and estimated label
