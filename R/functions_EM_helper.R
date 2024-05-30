@@ -53,7 +53,8 @@ E_step <- function(.D_test, .X_c = NA, .X_b = NA,
 E_step_multi <- function(.C_train, .D_train, .D_test,
                          .X_c = NA, .X_b = NA,
                          .class_prob, .word_prob,
-                         .mu = NA, .psi = NA, .sig = NA){
+                         .mu = NA, .psi = NA, .sig = NA,
+                         .n_class = 2){
   #' @description 
   #' E step of the EM algorithm with multiple clusters
   #' it has to take .D_train (labeled documents) too because
@@ -80,6 +81,8 @@ E_step_multi <- function(.C_train, .D_train, .D_test,
   poslab <- c(as.logical(.C_train[,2]), rep(F, nrow(.D_test))) # T if positive F ow
   neglab <- c(as.logical(.C_train[,1]), rep(F, nrow(.D_test))) # T if negative F ow
   unlab <- c(rep(F, length.out=nrow(.D_train)), rep(T, length.out=nrow(.D_test))) # T if labeled F ow 
+  lab <- c(rep(T, length.out=nrow(.D_train)), rep(F, length.out=nrow(.D_test))) # T if labeled F ow
+
   .D_all <- rbind(.D_train, .D_test)
 
   lk <- .D_all %*% .word_prob
@@ -147,6 +150,7 @@ E_step_multi <- function(.C_train, .D_train, .D_test,
   
   # for positive label documents, set probability of positive class to be 1 and others 0
   # Because they are in log scale, I plug a very small value instead of negative infinity
+  if (.n_class == 2){
 
   out[poslab, ncol(out)] <- 0   # last cluster is associated with positive class
   out[poslab, -ncol(out)] <- -Inf   # the other clusters are with negative class
@@ -166,6 +170,12 @@ E_step_multi <- function(.C_train, .D_train, .D_test,
   out[neglab, -ncol(out)] <- neglab_out # bring it back
   out[neglab, ncol(out)] <- -Inf
   # for unlabeled documents, usual E step is enough but add weight
+  } else {
+    # for multi-class classification, n_cluster should be equal to 
+    # n_classes, so we replace with the log version of .C_train
+    # for labeled documents
+    out[lab,] <- log(.C_train)
+  }
   
   return(list(E=out, unlab=unlab))
 }

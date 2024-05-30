@@ -340,16 +340,30 @@ multiEM <- function(.D_train=NULL, .C_train=NULL, .D_test,
   ## cluster probability are uniformly assigned
   ## TODO: Investigate if this creates instability across iterations.
   if (.choose_NB_init) {
-    cluster_train <- matrix(0, nrow = nrow(.C_train), ncol = .n_cluster)
-    for (i in 1:nrow(cluster_train)){
-      if (.C_train[i, 2] == 1) {
-        ## if positive label, we flag the last cluster
-        cluster_train[i, .n_cluster] <- 1
-      } else {
-        ## if negative, we randomly chose a cluster (but not the last cluster)
-        pick <- sample(seq(1, .n_cluster - 1), 1)
-        cluster_train[i, pick] <- 1
+    if (.n_class == 2) {
+      cluster_train <- matrix(0, nrow = nrow(.C_train), ncol = .n_cluster)
+      for (i in 1:nrow(cluster_train)){
+        if (.C_train[i, 2] == 1) {
+          ## if positive label, we flag the last cluster
+          cluster_train[i, .n_cluster] <- 1
+        } else {
+          ## if negative, we randomly chose a cluster (but not the last cluster)
+          pick <- sample(seq(1, .n_cluster - 1), 1)
+          cluster_train[i, pick] <- 1
+        }
       }
+    } else {
+      cluster_train <- matrix(0, nrow = nrow(.C_train), ncol = .n_cluster)
+      # for (i in 1:nrow(cluster_train)){
+      #   for (j in 1:n_cluster) {
+      #     if (.C_train[i, j] == 1) {
+      #       ## if positive label, we flag the last cluster
+      #       cluster_train[i, j] <- 1
+      #     }
+      #   }
+      # }
+
+      cluster_train <- .C_train
     }
   }
 
@@ -442,7 +456,8 @@ multiEM <- function(.D_train=NULL, .C_train=NULL, .D_test,
       .word_prob = word_prob,
       .mu = `if`(is.na(.cont_metadata_varnames[1]), NA, mu),
       .sig = `if`(is.na(.cont_metadata_varnames[1]), NA, sig),
-      .psi = `if`(is.na(.binary_metadata_varnames[1]), NA, psi)
+      .psi = `if`(is.na(.binary_metadata_varnames[1]), NA, psi),
+      .n_class = .n_class
     )
 
     ## combine known label and estimated label
